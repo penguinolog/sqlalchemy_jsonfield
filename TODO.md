@@ -1,5 +1,6 @@
 **TODO**
 
-* [ ] Unit tests (SQLite)
-* [ ] Unit tests (MySQL/MariaDB|PostgreSQL)
+* [x] Unit tests
+* [ ] Functional tests (SQLite)
+* [ ] Functional tests (MySQL/MariaDB|PostgreSQL)
 * [ ] Documentation

@@ -1,3 +1,17 @@
+#    Copyright 2016 Alexey Stepanov aka penguinolog
+
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
+
 """JSONField implementation for SQLAlchemy"""
 
 import sqlalchemy.ext.mutable
@@ -8,7 +22,7 @@ except ImportError:
     import json
 
 
-class _JSONField(sqlalchemy.types.TypeDecorator):
+class JSONField(sqlalchemy.types.TypeDecorator):
     """Represents an immutable structure as a json-encoded string or json
 
     Usage::
@@ -42,7 +56,7 @@ class _JSONField(sqlalchemy.types.TypeDecorator):
         """
         self.__enforce_string = enforce_string
         self.__enforce_unicode = enforce_unicode
-        super(_JSONField, self).__init__(*args, **kwargs)
+        super(JSONField, self).__init__(*args, **kwargs)
 
     def __use_json(self, dialect):
         """Helper to determine, which encoder to use"""
@@ -77,7 +91,5 @@ class _JSONField(sqlalchemy.types.TypeDecorator):
         return json.loads(value)
         # pylint: enable=no-member
 
-
-JSONField = sqlalchemy.ext.mutable.MutableDict.as_mutable(_JSONField)
 
 __all__ = ['JSONField']

@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""Python BinField implementation"""
+"""SQLAlchemy JSONField implementation"""
 
 import setuptools
 
