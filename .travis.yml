@@ -14,6 +14,8 @@ after_success:
   - coveralls
 notifications:
   email: true
+before_deploy:
+  - pip install -r requirements.txt
 deploy:
   - provider: pypi
     distributions: sdist bdist_wheel
