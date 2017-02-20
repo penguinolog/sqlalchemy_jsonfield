@@ -14,3 +14,22 @@ after_success:
   - coveralls
 notifications:
   email: true
+deploy:
+  matrix:
+  - provider: pypi
+    distributions: sdist bdist_wheel
+    server: https://testpypi.python.org/pypi
+    user: penguinolog
+    password:
+      secure: jdij/+r4QWEfktrerhe+TRkNmBhcq8QnZ/Ewc4kmusxM4J4wSMnx7uPzF5dXVLdGVpVsJXWI5MJ4n/j30j7+8qqQXY9Y6xy5nYb+rJQ6tnbTiW9wZf50L96B2tm5xx3jd5j/teQEpvnmBCWQQzbjU3IZBNirXDMM0Qr5rjEONMLdWE7XKSSTglOwY6sZtQnYyFOA9fbSHKbYAmTd2N1XUqPday94s0DlynbKzAF7haSp+AV4j4ZkLmiRUFHPGBnrqdsS3+4DyzivC6eTJw3y29iuwHFgSigq3Q7WBUCZNhGCOhVYWv+zgjmNVcSD/LkaTrrqOGvXDdDOWJhY95hAAZ0oV0aulauiwyvCgQ5uc4nyOjVBnoouBINLZ7aOf+aQbMmqi0fsFHjn+ASV6AkZjrv+lWKat/FDQxYiDvicKVdwtU3EwKVpwvuVV/M8tPbzfnVTyjCPSMh+gXso29S/HmsW3O64kJ2q6+/+90TN4f3AiC7mXP2wWiBK17XYA4HyfoRf94WJyavQHCR60/5jA2nG5IRgH799lsdiTQ8metM0C3A/Ead0gNlIInUqY9MAVfPEEMeWT6nr9mBeDuSLViDr7JTjqKFf1SIfcg96USXx+6mxpSa09cipIZEfh9s1XKAvCNASU7WnOI21XNn7aREChNr4AWV+0xHHqpnlBTQ=
+    on:
+      python: 3.5
+      tags: false
+  - provider: pypi
+    distributions: sdist bdist_wheel
+    user: penguinolog
+    password:
+      secure: dqXzYdB5Zq0IwMHiMkIAhuXmGS4YhbVd/Ox4g87H8Fjf6z2IL0LZiIRCxucitgGPBT4mqxgkrZtCaLEsLsiQGFOF3t7AWUO5H1HBIno5+kzMbL0SzGgnL7s/cmfg8D7u2JPoJPcf7dDTIXf7DHNVjfyA1GbgakdZYZcrsdfekRCP9VlX2NFLBmVBDkTZpNbjoZIP8av2SNVQxUCTRJwP5rnp5kILPk+VgDAjJWwgLZfagl/Duj5QEDi8zvRT9IBcpGY9yb6VfSheNQUcK1ifHHXzK1H4xf2IPowYZPbiYNA6zjNHfj9rmbsuAFKPP8LOVkmOv2JUo7MKAv2w7R4kUGgBAWhDcj57CgWnPQOsbMIBscBhU6zISR/1CcaVELNkGYatKu2MPrLFsNKcjyLJsmIAjuoGhiSnuQcn0gAlaCMSxiBExs0CZB1ztFKTkZeD03/I50xyX7aMFETJNvT7bqzc9mGPI5GgQwQSTOrpRQzVy82B5dKztb1pM41FGK0e9YxtKDnwu/jutmCFcyd0gQq5fKVA171gRMFDsabcca162MDGe3hhy3hbfOb8XJcLqKzXERN0rxPcmv3KQ1mIwkVSF6PN2aaIZ/+h6whZqd6cp2WgchYGoaYRqfe3lP26ijBiwgf5zI1x/X2nsH+PcRL13FxYnTf//XbhfKjYSZk=
+    on:
+      python: 3.5
+      tags: true
