@@ -5,6 +5,12 @@ SQLAlchemy_JSONField
     :target: https://travis-ci.org/penguinolog/sqlalchemy_jsonfield
 .. image:: https://coveralls.io/repos/github/penguinolog/sqlalchemy_jsonfield/badge.svg?branch=master
     :target: https://coveralls.io/github/penguinolog/sqlalchemy_jsonfield?branch=master
+.. image:: https://img.shields.io/pypi/v/sqlalchemy_jsonfield.svg
+    :target: https://pypi.python.org/pypi/sqlalchemy_jsonfield
+.. image:: https://img.shields.io/pypi/pyversions/sqlalchemy_jsonfield.svg
+    :target: https://pypi.python.org/pypi/sqlalchemy_jsonfield
+.. image:: https://img.shields.io/pypi/status/sqlalchemy_jsonfield.svg
+    :target: https://pypi.python.org/pypi/sqlalchemy_jsonfield
 .. image:: https://img.shields.io/github/license/penguinolog/sqlalchemy_jsonfield.svg
     :target: https://raw.githubusercontent.com/penguinolog/sqlalchemy_jsonfield/master/LICENSE
 
