@@ -17,6 +17,7 @@
 import sqlalchemy.ext.mutable
 import sqlalchemy.types
 try:
+    # noinspection PyPackageRequirements
     import ujson as json
 except ImportError:
     import json
@@ -52,7 +53,9 @@ class JSONField(sqlalchemy.types.TypeDecorator):
         """JSONField
 
         :param enforce_string: enforce String(UnicodeText) type usage
+        :type enforce_string: bool
         :param enforce_unicode: do not encode non-ascii data
+        :type enforce_unicode: bool
         """
         self.__enforce_string = enforce_string
         self.__enforce_unicode = enforce_unicode
@@ -92,4 +95,29 @@ class JSONField(sqlalchemy.types.TypeDecorator):
         # pylint: enable=no-member
 
 
-__all__ = ['JSONField']
+def mutable_json_field(
+    enforce_string=False,
+    enforce_unicode=False,
+    *args,
+    **kwargs
+):
+    """Mutable JSONField crreator
+
+    :param enforce_string: enforce String(UnicodeText) type usage
+    :type enforce_string: bool
+    :param enforce_unicode: do not encode non-ascii data
+    :type enforce_unicode: bool
+    :return: Mutable JSONField via MutableDict.as_mutable
+    :rtype: JSONField
+    """
+    return sqlalchemy.ext.mutable.MutableDict.as_mutable(
+        JSONField(
+            enforce_string=enforce_string,
+            enforce_unicode=enforce_unicode,
+            *args,
+            **kwargs
+        )
+    )
+
+
+__all__ = ['JSONField', 'mutable_json_field']
