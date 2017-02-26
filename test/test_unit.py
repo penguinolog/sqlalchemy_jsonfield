@@ -21,8 +21,13 @@ import sqlalchemy_jsonfield
 class BaseFunctionality(unittest.TestCase):
     def test_impl(self):
         # impl placeholder
-        self.assertEqual(
-            sqlalchemy_jsonfield.JSONField.impl,
+        self.assertIsInstance(
+            sqlalchemy_jsonfield.JSONField().impl,
+            sqlalchemy.types.TypeEngine
+        )
+
+        self.assertIsInstance(
+            sqlalchemy_jsonfield.mutable_json_field().impl,
             sqlalchemy.types.TypeEngine
         )
 
@@ -39,6 +44,13 @@ class BaseFunctionality(unittest.TestCase):
         )
 
         self.assertIsInstance(
+            sqlalchemy_jsonfield.mutable_json_field().load_dialect_impl(
+                mysql.dialect()
+            ),
+            sqlalchemy.types.JSON
+        )
+
+        self.assertIsInstance(
             sqlalchemy_jsonfield.JSONField().load_dialect_impl(
                 sqlite.dialect()
             ),
@@ -46,7 +58,23 @@ class BaseFunctionality(unittest.TestCase):
         )
 
         self.assertIsInstance(
+            sqlalchemy_jsonfield.mutable_json_field().load_dialect_impl(
+                sqlite.dialect()
+            ),
+            sqlalchemy.types.UnicodeText
+        )
+
+        self.assertIsInstance(
             sqlalchemy_jsonfield.JSONField(
+                enforce_string=True
+            ).load_dialect_impl(
+                mysql.dialect()
+            ),
+            sqlalchemy.types.UnicodeText
+        )
+
+        self.assertIsInstance(
+            sqlalchemy_jsonfield.mutable_json_field(
                 enforce_string=True
             ).load_dialect_impl(
                 mysql.dialect()

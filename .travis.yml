@@ -14,3 +14,24 @@ after_success:
   - coveralls
 notifications:
   email: true
+before_deploy:
+  - pip install -r requirements.txt
+deploy:
+  - provider: pypi
+    distributions: sdist bdist_wheel
+    server: https://testpypi.python.org/pypi
+    user: penguinolog
+    password:
+      secure: "PqefHORwbLqDZQJ52DUPBUBimSHk9zkZbYs2u1ulGtm25Fw8U0CytWyYRA8zHOeM+6Le7A9WXBuw0EkG7VExSadqPME/u/3NzuM4sNe+hUw7c4ai6Hsf0DUkOeERf9PH7u7f9y8SkHwHErEEFr719E0jog6xjYQIkC956YKy2EXftzE+hMSI91o7/mh0vso6nAzsgaYrymth6VDSomrGm3J0eiQgggVSoUp1OQtqgYBkXDSrC0hyU5wgMzYlinrqqvs8zgTXfy5rQY4YcXYqFkYf8SJi/vQ9tYp70Wh8VSYboW0lEw+f1CGUhYj0XymagXG4OQXDnpW7ewRVrnUWaTkLMSjfwTrG+gRrMZI8r9HUzwsB6xMjlox+MRg8eFU5PFwdkrLzyO81yBubsIF5BylBvyNpUp5NHNoxPUiUH/cW6gCXUv8Jz3pRHkyvDpwZ1jHrpMPZeCZB8oP1n50xZve/bSo95XN9WFjUY20rv5lk3pGfMtRPcBxzEEBulZW1Mlmt5gF1OM3voZKxJS0a4nsVN4tbqvWWx+PGBCg4W1L/ROyUhkwxm4jkt1fBT6/zj7Yt6fITW8FXP5wkr1puCwsCjt/Dnz47pCE57X/Rmw+z6RDNzBuTI1G9XCWht5wcwRDFpkL3hj/m76fahedrO6959LpVeq+EhWYQPnfqwoE="
+    on:
+      python: 3.5
+      tags: false
+    # PyPI
+  - provider: pypi
+    distributions: sdist bdist_wheel
+    user: penguinolog
+    password:
+      secure: "d7LUin2jil3ZHyu8W+nXwPpZISSD12/LJVenG1kySvuZ+hV5ovknhKcrEV4IOkyRlGVb/SEbCM60FExGobGn2goAhtv15tTve0KSmDfHbK0YZG7gPwQykFnuS3tOCoo4E4Pxjp17cgmvVuHJDWy546J6w+PGq+hfEL0xFPNR6lZNMd3+HqVnA0XsCbZcuOWFZuDQL4CQIgR1wxgqnD6PMun4P9xBt9C2clJWo6MDy5AaqO0qGodbyIare+c6MPrxluTBnE1ULzGLyn0+lj+V+UP8SyfVfrxp2CokOqs2NbTwuZHrvJu9mOJG3xRTYjyIBrUlWdiTejzDlJ3annqTaxemiFUq6KYLBcHqbugnPtPtqDt47Y9v0DBeJ/OTxZ8B2lFOD4r2IuAcQLkDLvCeESy4SLWDcDcHds6Czj3UIHQ2rB2XgzxYOHz1cpj4ZF84NNYSC0zIEUPXKG8iS2xmnlRHLrgd3jzKct+TaKzuOjN4EHjzea5Yzz6GHySt+EhgABVExste90fp0k7NJ8ipsa+GROMVOzKeYuj+h0djSTRzBxorX32Lisq+X6TXalXTvDup67/IJN9CYmDMPk+yxYqGhhuKUgj19+87dbW2DTCV+5eRxO2J7QMr20cZWLZnLR7tEJl6SPfLITcIBTDh3foa1wQgyJSwLTFoH/wOda4="
+    on:
+      python: 3.5
+      tags: true

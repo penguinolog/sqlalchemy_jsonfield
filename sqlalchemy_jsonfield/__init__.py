@@ -13,7 +13,7 @@
 
 """Implement JSONField for SQLAlchemy"""
 
-from .jsonfield import JSONField
+from .jsonfield import JSONField, mutable_json_field
 
-__version__ = '0.1.0'
+__version__ = '0.3.2'
 __author__ = "Alexey Stepanov <penguinolog@gmail.com>"

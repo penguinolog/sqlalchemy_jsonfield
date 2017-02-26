@@ -25,11 +25,11 @@ with open('requirements.txt') as f:
     required = f.readlines()
 
 setuptools.setup(
-    name='SQLALchemy_JSONField',
+    name='SQLAlchemy_JSONField',
     version=sqlalchemy_jsonfield.__version__,
     packages=setuptools.find_packages(),
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
