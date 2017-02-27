@@ -1,0 +1,12 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  override:
+    - docker info
+    - docker build --rm=false -t circleci/test_sqlalchemy_jsonfield .
+
+test:
+  override:
+    - docker run circleci/test_sqlalchemy_jsonfield
