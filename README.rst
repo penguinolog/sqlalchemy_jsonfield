@@ -5,7 +5,7 @@ SQLAlchemy_JSONField
     :target: https://travis-ci.org/penguinolog/sqlalchemy_jsonfield
 .. image:: https://coveralls.io/repos/github/penguinolog/sqlalchemy_jsonfield/badge.svg?branch=master
     :target: https://coveralls.io/github/penguinolog/sqlalchemy_jsonfield?branch=master
-.. image:: https://circleci.com/gh/penguinolog/sqlalchemy_jsonfield.svg?style=svg
+.. image:: https://img.shields.io/circleci/project/github/penguinolog/sqlalchemy_jsonfield.svg
     :target: https://circleci.com/gh/penguinolog/sqlalchemy_jsonfield
 .. image:: https://img.shields.io/pypi/v/sqlalchemy_jsonfield.svg
     :target: https://pypi.python.org/pypi/sqlalchemy_jsonfield
