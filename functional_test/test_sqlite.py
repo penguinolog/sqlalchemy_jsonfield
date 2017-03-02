@@ -1,7 +1,6 @@
 # coding=utf-8
 # pylint: disable=missing-docstring, unused-argument
 
-import collections
 import os.path
 import sqlite3
 import tempfile
@@ -42,13 +41,6 @@ class ExampleTable(Base):
     )
 
 
-# SQLite column info
-ColumnInfo = collections.namedtuple(
-    'ColumnInfo',
-    ('cid', 'name', 'type', 'notnul', 'dflt_value', 'pk')
-)
-
-
 class SQLIteTests(unittest.TestCase):
     def setUp(self):
         if os.path.exists(db_path):
@@ -74,19 +66,22 @@ class SQLIteTests(unittest.TestCase):
             database='file:{}?mode=ro'.format(db_path),
             uri=True
         ) as conn:
+            conn.row_factory = sqlite3.Row
             c = conn.cursor()
             c.execute('PRAGMA TABLE_INFO({})'.format(table_name))
-            result = [ColumnInfo(*val) for val in c.fetchall()]
+            collected = c.fetchall()
+            keys = [col[0] for col in c.description]
+            result = [dict(zip(keys, col)) for col in collected]
 
-        columns = {info.name: info for info in result}
+        columns = {info['name']: info for info in result}
 
         json_record = columns['json_record']
 
         self.assertEqual(
-            json_record.type,
+            json_record['type'],
             'TEXT',
             'Unexpected column type: received: {!s}, expected: TEXT'.format(
-                json_record.type)
+                json_record['type'])
         )
 
     def test_operate(self):

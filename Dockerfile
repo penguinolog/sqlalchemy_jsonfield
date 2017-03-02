@@ -6,8 +6,6 @@ RUN pip install -U setuptools tox pip
 # Copy tests
 ADD . /mnt/test
 WORKDIR /mnt/test
-# Pre-cleanup for local run
-RUN rm -f **/*.pyc && rm -rf **/__pycache__
 
 # Default target: run functional tests, which requires FS access.
 CMD tox -e functional
