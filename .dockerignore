@@ -141,6 +141,8 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+doc/build/
+doc/source/modules/
 
 # PyBuilder
 target/
@@ -167,3 +169,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Test results
+/*_result.xml

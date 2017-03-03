@@ -1,12 +1,38 @@
-machine:
-  services:
-    - docker
+version: 2
+executorType: docker
+containerInfo:
+  - image: python:latest
+stages:
+  build:
+    workDir: ~/sqlalchemy_jsonfield
+    steps:
+      - type: checkout
+      # Install packages, required to run tests
+      - type: shell
+        shell: /bin/bash
+        command: |
+          apt-get update && apt-get upgrade -y && apt-get install -y libpq-dev gcc
+      # Install python packages
+      - type: shell
+        shell: /bin/bash
+        command: pip install -U setuptools tox pip
+      # Run tests
+      - type: shell
+        shell: /bin/bash
+        command: tox -e functional
+      # Collect results
+      - type: test-results-store
+        path: ~/sqlalchemy_jsonfield  # Workdir
 
-dependencies:
-  override:
-    - docker info
-    - docker build --rm=false -t circleci/test_sqlalchemy_jsonfield .
-
-test:
-  override:
-    - docker run circleci/test_sqlalchemy_jsonfield
+#machine:
+#  services:
+#    - docker
+#
+#dependencies:
+#  override:
+#    - docker info
+#    - docker build --rm=false -t circleci/test_sqlalchemy_jsonfield .
+#
+#test:
+#  override:
+#    - docker run circleci/test_sqlalchemy_jsonfield
