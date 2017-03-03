@@ -48,7 +48,7 @@ class SQLIteTests(unittest.TestCase):
 
         engine = sqlalchemy.create_engine(
             'sqlite:///{}'.format(db_path),
-            echo=True
+            echo=False
         )
 
         Base.metadata.create_all(engine)
@@ -70,8 +70,7 @@ class SQLIteTests(unittest.TestCase):
             c = conn.cursor()
             c.execute('PRAGMA TABLE_INFO({})'.format(table_name))
             collected = c.fetchall()
-            keys = [col[0] for col in c.description]
-            result = [dict(zip(keys, col)) for col in collected]
+            result = [dict(col) for col in collected]
 
         columns = {info['name']: info for info in result}
 
