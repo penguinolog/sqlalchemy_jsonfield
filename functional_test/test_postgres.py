@@ -8,12 +8,6 @@ import sqlalchemy.engine.url
 import sqlalchemy.orm
 import psycopg2
 
-try:
-    # noinspection PyPackageRequirements
-    import ujson as json
-except ImportError:
-    import json
-
 import sqlalchemy_jsonfield
 
 # Host
@@ -123,7 +117,7 @@ class PostgreSQLTests(unittest.TestCase):
         ) as conn:
             with conn.cursor() as cursor:
                 sql = "SELECT row_name, json_record FROM {tbl}".format(
-                            tbl=table_name
+                    tbl=table_name
                 )
                 cursor.execute(sql)
                 result = dict(cursor.fetchall())
