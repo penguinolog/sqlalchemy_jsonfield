@@ -1,13 +1,14 @@
 # coding=utf-8
 # pylint: disable=missing-docstring, unused-argument
 
-import os.path
-import sqlite3
-import tempfile
 import unittest
 
 import sqlalchemy.ext.declarative
+import sqlalchemy.engine.url
 import sqlalchemy.orm
+# noinspection PyPackageRequirements
+import pymysql.cursors
+
 try:
     # noinspection PyPackageRequirements
     import ujson as json
@@ -16,9 +17,16 @@ except ImportError:
 
 import sqlalchemy_jsonfield
 
+# Host
+# host_name = '127.0.0.1'
+host_name = 'mariadb'
 
-# Path to test database
-db_path = os.path.join(tempfile.gettempdir(), 'test.sqlite3')
+# Login
+user = 'root'
+password = ''
+
+# Schema name
+schema_name = 'test_schema'
 
 # Table name
 table_name = 'create_test'
@@ -36,18 +44,59 @@ class ExampleTable(Base):
         unique=True,
     )
     json_record = sqlalchemy.Column(
-        sqlalchemy_jsonfield.JSONField(),
+        sqlalchemy_jsonfield.JSONField(
+            enforce_string=True,  # MariaDB does not support JSON for now
+        ),
         nullable=False
     )
 
 
-class SQLIteTests(unittest.TestCase):
-    def setUp(self):
-        if os.path.exists(db_path):
-            os.remove(db_path)
+@unittest.skip('Need to update circleci config.')
+class MySQLTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        with pymysql.connect(
+            host=host_name,
+            user=user,
+            password=password,
+            charset='utf8',
+        ) as cursor:
+            # Read a single record
+            sql = (
+                "DROP SCHEMA IF EXISTS {sch};"
+                "CREATE SCHEMA {sch};"
+                "COMMIT;".format(
+                    sch=schema_name
+                )
+            )
+            cursor.execute(sql)
 
+    @classmethod
+    def tearDownClass(cls):
+        with pymysql.connect(
+            host=host_name,
+            user=user,
+            password=password,
+            charset='utf8',
+        ) as cursor:
+            # Read a single record
+            sql = (
+                "DROP SCHEMA IF EXISTS {sch};"
+                "COMMIT;".format(
+                    sch=schema_name
+                )
+            )
+            cursor.execute(sql)
+
+    def setUp(self):
         engine = sqlalchemy.create_engine(
-            'sqlite:///{}'.format(db_path),
+            sqlalchemy.engine.url.URL(
+                drivername='mysql+pymysql',
+                username=user,
+                password=password,
+                host=host_name,
+                database=schema_name,
+            ),
             echo=False
         )
 
@@ -57,34 +106,13 @@ class SQLIteTests(unittest.TestCase):
         Session = sqlalchemy.orm.sessionmaker(engine)
         self.session = Session()
 
-    def test_create(self):
-        """Check column type"""
-        # noinspection PyArgumentList
-        with sqlite3.connect(
-            database='file:{}?mode=ro'.format(db_path),
-            uri=True
-        ) as conn:
-            conn.row_factory = sqlite3.Row
-            c = conn.cursor()
-            c.execute('PRAGMA TABLE_INFO({})'.format(table_name))
-            collected = c.fetchall()
-            result = [dict(col) for col in collected]
-
-        columns = {info['name']: info for info in result}
-
-        json_record = columns['json_record']
-
-        self.assertEqual(
-            json_record['type'],
-            'TEXT',
-            'Unexpected column type: received: {!s}, expected: TEXT'.format(
-                json_record['type'])
-        )
+    def tearDown(self):
+        self.session.close()
 
     def test_operate(self):
-        """Check column data operation"""
-        test_dict = {'key': 'value'}
-        test_list = ['item0', 'item1']
+        """Check column data operation with unicode specific."""
+        test_dict = {'key': 'значение'}
+        test_list = ['item0', 'элемент1']
 
         # fill table
 
@@ -122,21 +150,19 @@ class SQLIteTests(unittest.TestCase):
             )
         )
 
-        # Low level
-
-        # noinspection PyArgumentList
-        with sqlite3.connect(
-            database='file:{}?mode=ro'.format(db_path),
-            uri=True
-        ) as conn:
-            c = conn.cursor()
-            c.execute(
-                'SELECT row_name, json_record FROM {tbl}'.format(
-                    tbl=table_name
-                ),
+        with pymysql.connect(
+            host=host_name,
+            user=user,
+            password=password,
+            db=schema_name,
+            charset='utf8',
+        ) as cursor:
+            # Read a single record
+            sql = "SELECT row_name, json_record FROM {tbl}".format(
+                tbl=table_name
             )
-
-            result = dict(c.fetchall())
+            cursor.execute(sql)
+            result = dict(cursor.fetchall())
 
             self.assertEqual(
                 result['dict_record'],
