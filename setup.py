@@ -29,7 +29,7 @@ setuptools.setup(
     version=sqlalchemy_jsonfield.__version__,
     packages=setuptools.find_packages(),
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',

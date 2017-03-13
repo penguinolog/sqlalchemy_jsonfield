@@ -2,5 +2,6 @@
 
 * [x] Unit tests
 * [x] Functional tests (SQLite)
-* [ ] Functional tests (MySQL/MariaDB|PostgreSQL)
+* [x] Functional tests (MySQL/MariaDB|PostgreSQL)
+* [ ] Functional tests on CI
 * [ ] Documentation

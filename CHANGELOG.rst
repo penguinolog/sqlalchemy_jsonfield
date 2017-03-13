@@ -1,5 +1,15 @@
 CHANGELOG
 =========
+Version 0.5.0
+-------------
+* Development Status :: 4 - Beta (functional tests passed multiple times in several db configurations)
+
+* Update docs
+
+* Example in README
+
+* Fixed docstrings (now covered by pep257 checker)
+
 Version 0.3.2
 -------------
 Technical bump: Start of CI/CD usage

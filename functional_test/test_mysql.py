@@ -64,8 +64,7 @@ class MySQLTests(unittest.TestCase):
             # Read a single record
             sql = (
                 "DROP SCHEMA IF EXISTS {sch};"
-                "CREATE SCHEMA {sch};"
-                "COMMIT;".format(
+                "CREATE SCHEMA {sch};".format(
                     sch=schema_name
                 )
             )
@@ -81,8 +80,7 @@ class MySQLTests(unittest.TestCase):
         ) as cursor:
             # Read a single record
             sql = (
-                "DROP SCHEMA IF EXISTS {sch};"
-                "COMMIT;".format(
+                "DROP SCHEMA IF EXISTS {sch};".format(
                     sch=schema_name
                 )
             )

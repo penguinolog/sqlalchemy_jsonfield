@@ -18,7 +18,26 @@ SQLAlchemy_JSONField
 
 SQLALchemy JSONField implementation for storing dicts at SQL independently from JSON type support.
 
+Why?
+----
+
+SqlAlchemy provides JSON field support for several database types (PostgreSQL and MySQL for now)
+and semi-working dict <-> JSON <-> VARCHAR example, but...
+In real scenarios we have tests on sqlite, production on MySQL/MariaDB/Percona/PostgreSQL
+and some of them (modern Oracle MySQL & PostgreSQL) support JSON,
+some of them (SQLite, Percona & MariaDB) requires data conversion to Text (not VARCHAR).
+
+As addition, we have different levels of Unicode support on database and connector side,
+so we may be interested to switch JSON encoding between deployments.
+
+Solution:
+---------
+
+SQLALchemy JSONField has API with suport for automatic switch between native JSON and JSON encoded data,
+and encoding to JSON string can be enforced.
+
 Pros:
+-----
 
 * Free software: Apache license
 * Open Source: https://github.com/penguinolog/sqlalchemy_jsonfield
@@ -34,6 +53,35 @@ Pros:
     Python 3.6
     PyPy
     PyPy3
+
+Usage
+=====
+Direct usage with MariaDB (example extracted from functional tests):
+
+.. code-block:: python
+
+  import sqlalchemy_jsonfield
+
+  class ExampleTable(Base):
+      __tablename__ = table_name
+      id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+      row_name = sqlalchemy.Column(
+          sqlalchemy.Unicode(64),
+          unique=True,
+      )
+      json_record = sqlalchemy.Column(
+          sqlalchemy_jsonfield.JSONField(
+              # MariaDB does not support JSON for now
+              enforce_string=True,
+              # MariaDB connector requires additional parameters for correct UTF-8
+              enforce_unicode=False
+          ),
+          nullable=False
+      )
+
+
+Usage on PostgreSQL/Oracle MySQL(modern version)/SQLite(testing) environments allows to set `enforce_string=False`
+and use native JSON fields.
 
 Testing
 =======

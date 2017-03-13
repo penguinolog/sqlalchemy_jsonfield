@@ -11,9 +11,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""Implement JSONField for SQLAlchemy"""
+"""Implement JSONField for SQLAlchemy."""
 
 from .jsonfield import JSONField, mutable_json_field
 
-__version__ = '0.3.2'
+__version__ = '0.5.0'
 __author__ = "Alexey Stepanov <penguinolog@gmail.com>"

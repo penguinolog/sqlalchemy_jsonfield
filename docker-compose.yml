@@ -21,7 +21,6 @@ services:
     healthcheck:
       test: pg_ctl status
       interval: 1m
-#      timeout: 10s
       retries: 10
   python:
     build: .
