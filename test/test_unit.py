@@ -31,11 +31,6 @@ class BaseFunctionality(unittest.TestCase):
             sqlalchemy.types.TypeEngine
         )
 
-        # self.assertEqual(
-        #     sqlalchemy_jsonfield.JSONField().python_type,
-        #     dict
-        # )
-
         self.assertIsInstance(
             sqlalchemy_jsonfield.JSONField().load_dialect_impl(
                 mysql.dialect()
