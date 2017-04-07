@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 0.6.0
+-------------
+* Allow to run setup.py on not installed package (`__init__.py` imports fix).
+
 Version 0.5.0
 -------------
 * Development Status :: 4 - Beta (functional tests passed multiple times in several db configurations)

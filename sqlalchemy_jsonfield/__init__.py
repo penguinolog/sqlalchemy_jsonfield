@@ -13,7 +13,11 @@
 
 """Implement JSONField for SQLAlchemy."""
 
-from .jsonfield import JSONField, mutable_json_field
+try:
+    from .jsonfield import JSONField, mutable_json_field
+except ImportError:
+    # Package is not installed
+    pass
 
-__version__ = '0.5.0'
+__version__ = '0.6.0'
 __author__ = "Alexey Stepanov <penguinolog@gmail.com>"
