@@ -15,7 +15,7 @@ after_success:
 notifications:
   email: true
 before_deploy:
-  - pip install -r requirements.txt
+  - pip install sqlalchemy
 deploy:
   - provider: pypi
     distributions: sdist bdist_wheel

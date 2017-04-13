@@ -2,20 +2,17 @@ root = true
 
 [*]
 charset = utf-8
-insert_final_newline = true
 end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.py]
-indent_style = space
-indent_size = 4
-insert_final_newline = true
+[*.{py,ini}]
 max_line_length = 79
 
-[*.{ini,md}]
-indent_style = space
-indent_size = 4
-
 [*.{yml,rst}]
-indent_style = space
 indent_size = 2
+
+[Makefile]
+indent_style = tab

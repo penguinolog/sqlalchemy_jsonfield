@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+Version 0.6.2
+-------------
+* Move the most metadata from `setup.py` to `setup.cfg`.
+* Move `requirements.txt` to `setup.cfg`.
+
 Version 0.6.0
 -------------
 * Allow to run setup.py on not installed package (`__init__.py` imports fix).
