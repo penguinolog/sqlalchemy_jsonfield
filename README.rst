@@ -1,4 +1,4 @@
-SQLAlchemy_JSONField
+SQLAlchemy-JSONField
 ====================
 
 .. image:: https://travis-ci.org/penguinolog/sqlalchemy_jsonfield.svg?branch=master

@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+Version 0.6.4
+-------------
+* Fix readme naming.
+
+Version 0.6.3
+-------------
+* Remove name duplication (setup.py|setup.cfg)
+
 Version 0.6.2
 -------------
 * Move the most metadata from `setup.py` to `setup.cfg`.
