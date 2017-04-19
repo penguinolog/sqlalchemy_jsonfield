@@ -15,5 +15,5 @@
 
 from .jsonfield import JSONField, mutable_json_field
 
-__version__ = '0.6.2'
+__version__ = '0.6.3'
 __author__ = "Alexey Stepanov <penguinolog@gmail.com>"
