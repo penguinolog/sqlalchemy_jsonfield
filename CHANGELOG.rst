@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+Version 0.6.5
+-------------
+* Use `ast.literal_eval` instead of `eval` in isolated env for `__init__.py` parsing.
+* Do not rely on `six` in `setup.py`.
+
 Version 0.6.4
 -------------
 * Fix readme naming.

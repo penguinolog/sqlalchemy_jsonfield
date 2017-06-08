@@ -17,9 +17,12 @@
 import ast
 import collections
 import os.path
+import sys
 
 import setuptools
-import six
+
+PY3 = sys.version_info[:2] > (2, 7)
+PY34 = sys.version_info[:2] > (3, 3)
 
 with open(
     os.path.join(
@@ -38,9 +41,9 @@ def get_simple_vars_from_src(src):
     :type src: str
     :rtype: collections.OrderedDict
     """
-    ast_string = (ast.Str,)
-    if six.PY3:
-        ast_string += (ast.Bytes,)
+    ast_data = (ast.Str, ast.Num, )
+    if PY3:
+        ast_data += (ast.Bytes,)
 
     tree = ast.parse(src)
 
@@ -55,20 +58,16 @@ def get_simple_vars_from_src(src):
             ) and isinstance(
                 tgt.ctx, ast.Store
             ):
-                if isinstance(node.value, ast.Num):  # Number, incl. complex
-                    result[tgt.id] = node.value.n
-                elif isinstance(node.value, ast_string):  # String, incl bytes
-                    result[tgt.id] = node.value.s
+                if isinstance(node.value, ast_data):
+                    result[tgt.id] = ast.literal_eval(node.value)
                 elif isinstance(  # NameConstant in python < 3.4
                     node.value, ast.Name
                 ) and isinstance(
                     node.value.ctx, ast.Load  # Read constant
                 ):
-                    # pylint: disable=eval-used
-                    result[tgt.id] = eval(node.value.id, {}, {}) in {}  # nosec
-                    # pylint: enable=eval-used
-                elif six.PY34 and isinstance(node.value, ast.NameConstant):
-                    result[tgt.id] = node.value.value
+                    result[tgt.id] = ast.literal_eval(node.value)
+                elif PY34 and isinstance(node.value, ast.NameConstant):
+                    result[tgt.id] = ast.literal_eval(node.value)
     return result
 
 
