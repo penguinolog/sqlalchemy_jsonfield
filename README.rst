@@ -42,7 +42,7 @@ Pros:
 * Free software: Apache license
 * Open Source: https://github.com/penguinolog/sqlalchemy_jsonfield
 * Self-documented code: docstrings with types in comments
-* Uses native JSON, if possible
+* Uses native JSON by default, but allows to specify different library.
 * Support miltiple Python versions:
 
 ::
@@ -79,6 +79,28 @@ Direct usage with MariaDB (example extracted from functional tests):
           nullable=False
       )
 
+Usage with alternate JSON library:
+
+.. code-block:: python
+
+  import sqlalchemy_jsonfield
+  import ujson
+
+  class ExampleTable(Base):
+      __tablename__ = table_name
+      id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+      row_name = sqlalchemy.Column(
+          sqlalchemy.Unicode(64),
+          unique=True,
+      )
+      json_record = sqlalchemy.Column(
+          sqlalchemy_jsonfield.JSONField(
+              enforce_string=True,
+              enforce_unicode=False,
+              json=ujson,  # Use ujson instead of standard json.
+          ),
+          nullable=False
+      )
 
 Usage on PostgreSQL/Oracle MySQL(modern version)/SQLite(testing) environments allows to set `enforce_string=False`
 and use native JSON fields.

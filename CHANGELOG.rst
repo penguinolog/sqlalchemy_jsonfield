@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+Version 0.7.0
+-------------
+* Do not rely on ujson.
+* allow to override JSON library.
+Update setup.py from doctedsted get_simple_vars_from_src.
 Version 0.6.5
 -------------
 * Use `ast.literal_eval` instead of `eval` in isolated env for `__init__.py` parsing.

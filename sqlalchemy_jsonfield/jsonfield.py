@@ -14,13 +14,10 @@
 
 """JSONField implementation for SQLAlchemy."""
 
+import json
+
 import sqlalchemy.ext.mutable
 import sqlalchemy.types
-try:
-    # noinspection PyPackageRequirements
-    import ujson as json
-except ImportError:
-    import json
 
 __all__ = ('JSONField', 'mutable_json_field')
 
@@ -46,6 +43,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):
             self,
             enforce_string=False,
             enforce_unicode=False,
+            json=json,
             *args,
             **kwargs
     ):
@@ -55,9 +53,12 @@ class JSONField(sqlalchemy.types.TypeDecorator):
         :type enforce_string: bool
         :param enforce_unicode: do not encode non-ascii data
         :type enforce_unicode: bool
+        :param json: JSON encoding/decoding library.
+                     By default: standard json package.
         """
         self.__enforce_string = enforce_string
         self.__enforce_unicode = enforce_unicode
+        self.__json_codec = json
         super(JSONField, self).__init__(*args, **kwargs)
 
     def __use_json(self, dialect):
@@ -78,7 +79,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):
             return value
 
         # pylint: disable=no-member
-        return json.dumps(
+        return self.__json_codec.dumps(
             value,
             ensure_ascii=not self.__enforce_unicode
         )
@@ -90,7 +91,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):
             return value
 
         # pylint: disable=no-member
-        return json.loads(value)
+        return self.__json_codec.loads(value)
         # pylint: enable=no-member
 # pylint: enable=abstract-method
 
@@ -98,6 +99,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):
 def mutable_json_field(
     enforce_string=False,
     enforce_unicode=False,
+    json=json,
     *args,
     **kwargs
 ):
@@ -107,6 +109,8 @@ def mutable_json_field(
     :type enforce_string: bool
     :param enforce_unicode: do not encode non-ascii data
     :type enforce_unicode: bool
+    :param json: JSON encoding/decoding library.
+                 By default: standard json package.
     :return: Mutable JSONField via MutableDict.as_mutable
     :rtype: JSONField
     """
@@ -114,6 +118,7 @@ def mutable_json_field(
         JSONField(
             enforce_string=enforce_string,
             enforce_unicode=enforce_unicode,
+            json=json,
             *args,
             **kwargs
         )

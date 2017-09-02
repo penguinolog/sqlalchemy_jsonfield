@@ -6,10 +6,7 @@ from __future__ import unicode_literals
 
 import unittest
 
-try:
-    import ujson as json
-except ImportError:
-    import json
+import json
 
 import sqlalchemy.types
 from sqlalchemy.dialects import mysql, sqlite

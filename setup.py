@@ -39,11 +39,55 @@ def get_simple_vars_from_src(src):
 
     :param src: Source code
     :type src: str
-    :rtype: collections.OrderedDict
+    :returns: OrderedDict with keys, values = variable names, values
+    :rtype: typing.Dict[
+                str,
+                typing.Union[
+                    str, bytes,
+                    int, float, complex,
+                    list, set, dict, tuple,
+                    None,
+                ]
+            ]
+
+    Limitations: Only defined from scratch variables.
+    Not supported by design:
+        * Imports
+        * Executable code, including string formatting and comprehensions.
+
+    Examples:
+
+    >>> string_sample = "a = '1'"
+    >>> get_simple_vars_from_src(string_sample)
+    OrderedDict([('a', '1')])
+
+    >>> int_sample = "b = 1"
+    >>> get_simple_vars_from_src(int_sample)
+    OrderedDict([('b', 1)])
+
+    >>> list_sample = "c = [u'1', b'1', 1, 1.0, 1j, None]"
+    >>> result = get_simple_vars_from_src(list_sample)
+    >>> result == collections.OrderedDict(
+    ...     [('c', [u'1', b'1', 1, 1.0, 1j, None])]
+    ... )
+    True
+
+    >>> iterable_sample = "d = ([1], {1: 1}, {1})"
+    >>> get_simple_vars_from_src(iterable_sample)
+    OrderedDict([('d', ([1], {1: 1}, {1}))])
+
+    >>> multiple_assign = "e = f = g = 1"
+    >>> get_simple_vars_from_src(multiple_assign)
+    OrderedDict([('e', 1), ('f', 1), ('g', 1)])
     """
-    ast_data = (ast.Str, ast.Num, )
+    ast_data = (
+        ast.Str, ast.Num,
+        ast.List, ast.Set, ast.Dict, ast.Tuple
+    )
     if PY3:
         ast_data += (ast.Bytes,)
+    if PY34:
+        ast_data += (ast.NameConstant,)
 
     tree = ast.parse(src)
 
@@ -52,22 +96,26 @@ def get_simple_vars_from_src(src):
     for node in ast.iter_child_nodes(tree):
         if not isinstance(node, ast.Assign):  # We parse assigns only
             continue
+        try:
+            if isinstance(node.value, ast_data):
+                value = ast.literal_eval(node.value)
+            elif isinstance(  # NameConstant in python < 3.4
+                node.value, ast.Name
+            ) and isinstance(
+                node.value.ctx, ast.Load  # Read constant
+            ):
+                value = ast.literal_eval(node.value)
+            else:
+                continue
+        except ValueError:
+            continue
         for tgt in node.targets:
             if isinstance(
                 tgt, ast.Name
             ) and isinstance(
                 tgt.ctx, ast.Store
             ):
-                if isinstance(node.value, ast_data):
-                    result[tgt.id] = ast.literal_eval(node.value)
-                elif isinstance(  # NameConstant in python < 3.4
-                    node.value, ast.Name
-                ) and isinstance(
-                    node.value.ctx, ast.Load  # Read constant
-                ):
-                    result[tgt.id] = ast.literal_eval(node.value)
-                elif PY34 and isinstance(node.value, ast.NameConstant):
-                    result[tgt.id] = ast.literal_eval(node.value)
+                result[tgt.id] = value
     return result
 
 
@@ -76,9 +124,4 @@ variables = get_simple_vars_from_src(source)
 setuptools.setup(
     name='SQLAlchemy-JSONField',
     version=variables['__version__'],
-    extras_require={
-        ':platform_python_implementation == "CPython"': [
-            'ujson',
-        ],
-    },
 )
