@@ -44,6 +44,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):
             enforce_string=False,
             enforce_unicode=False,
             json=json,
+            json_type=sqlalchemy.JSON,
             *args,
             **kwargs
     ):
@@ -55,10 +56,14 @@ class JSONField(sqlalchemy.types.TypeDecorator):
         :type enforce_unicode: bool
         :param json: JSON encoding/decoding library.
                      By default: standard json package.
+        :param json_type: the sqlalchemy/dialect class that will be
+                          used to render the DB JSON type.
+                          By default: sqlalchemy.JSON
         """
         self.__enforce_string = enforce_string
         self.__enforce_unicode = enforce_unicode
         self.__json_codec = json
+        self.__json_type = json_type
         super(JSONField, self).__init__(*args, **kwargs)
 
     def __use_json(self, dialect):
@@ -70,7 +75,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):
     def load_dialect_impl(self, dialect):
         """Select impl by dialect."""
         if self.__use_json(dialect):
-            return dialect.type_descriptor(sqlalchemy.JSON)
+            return dialect.type_descriptor(self.__json_type)
         return dialect.type_descriptor(sqlalchemy.UnicodeText)
 
     def process_bind_param(self, value, dialect):
