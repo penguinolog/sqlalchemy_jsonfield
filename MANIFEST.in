@@ -1,1 +1,5 @@
 include *.rst LICENSE
+exclude .travis.yml circle.yml appveyor.yml
+exclude tox.ini pytest.ini .coveragerc
+prune test
+exclude CODE_OF_CONDUCT.md

@@ -51,6 +51,7 @@ Pros:
     Python 3.4
     Python 3.5
     Python 3.6
+    Python 3.7
     PyPy
     PyPy3
 
@@ -117,6 +118,7 @@ Test environments available:
     py34
     py35
     py36
+    py37
     pypy
     pypy3
     pylint
