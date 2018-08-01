@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+Version 0.7.1
+-------------
+* User can specify the JSON class he wants (Thanks to @massimiliano-della-rovere )
+* Python 3.7 checked
+
 Version 0.7.0
 -------------
 * Do not rely on ujson.

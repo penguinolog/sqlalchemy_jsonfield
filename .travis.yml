@@ -47,6 +47,7 @@ jobs:
     services: []
     install:
     - *upgrade_python_toolset
+    script: []
     before_deploy:
     - pip install sqlalchemy
     deploy:
