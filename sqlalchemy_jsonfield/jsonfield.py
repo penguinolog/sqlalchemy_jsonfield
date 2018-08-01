@@ -39,7 +39,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):
 
     impl = sqlalchemy.types.TypeEngine  # Special placeholder
 
-    def __init__(
+    def __init__(  # pylint: disable=keyword-arg-before-vararg
             self,
             enforce_string=False,
             enforce_unicode=False,
@@ -101,7 +101,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):
 # pylint: enable=abstract-method
 
 
-def mutable_json_field(
+def mutable_json_field(  # pylint: disable=keyword-arg-before-vararg
     enforce_string=False,
     enforce_unicode=False,
     json=json,
