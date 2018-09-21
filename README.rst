@@ -15,6 +15,8 @@ SQLAlchemy-JSONField
     :target: https://pypi.python.org/pypi/sqlalchemy_jsonfield
 .. image:: https://img.shields.io/github/license/penguinolog/sqlalchemy_jsonfield.svg
     :target: https://raw.githubusercontent.com/penguinolog/sqlalchemy_jsonfield/master/LICENSE
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/ambv/black
 
 SQLALchemy JSONField implementation for storing dicts at SQL independently from JSON type support.
 

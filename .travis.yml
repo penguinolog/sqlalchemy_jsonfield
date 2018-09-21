@@ -1,55 +1,119 @@
 sudo: false
 language: python
 os: linux
-python:
-- 2.7
-- 3.4
-- 3.5
-- 3.6
-- &mainstream_python 3.7-dev
-- &pypy pypy
-- pypy3.5
 install:
 - &upgrade_python_toolset pip install --upgrade pip setuptools wheel
-- pip install tox-travis
-- pip install coveralls
-script: tox
+- pip install --upgrade pytest pytest-sugar
+- &install_deps pip install sqlalchemy
+- pip install --upgrade pytest-cov coveralls
+
+_python:
+- &python27
+  name: "Python 2.7"
+  python: 2.7
+- &python34
+  name: "Python 3.4"
+  python: 3.4
+- &python35
+  name: "Python 3.5"
+  python: 3.5
+- &python36
+  name: "Python 3.6"
+  python: 3.6
+- &python37
+  name: "Python 3.7"
+  python: 3.7
+  dist: xenial
+  sudo: true
+- &pypy
+  name: "PyPy"
+  python: pypy
+- &pypy3
+  name: "PyPy3"
+  python: pypy3.5
+
+_helpers:
+- &build_package python setup.py bdist_wheel
+  
+- &static_analysis
+  stage: Static analysis
+  <<: *python37
+  after_success: skip
+
+- &code_style_check
+  stage: Code style check
+  <<: *python37
+  after_success: skip
+
+script:
+- pip install -e .
+- py.test -vv --cov-config .coveragerc --cov-report= --cov=sqlalchemy_jsonfield test
+- coverage report -m --fail-under 89
 after_success:
 - coveralls
 
 jobs:
   fast_finish: true
   include:
-  - stage: Static analisys
-    python: 3.6
-    services: []
-    install:
-    - *upgrade_python_toolset
-    - pip install tox
-    script:
-    - tox -e pylint,bandit
-    after_success: skip
+  - stage: test
+    <<: *python27
+  - stage: test
+    <<: *python34
+  - stage: test
+    <<: *python35
+  - stage: test
+    <<: *python36
+  - stage: test
+    <<: *python37
+  - stage: test
+    <<: *pypy
+  - stage: test
+    <<: *pypy3
 
-  - stage: Code style check
-    python: *mainstream_python
+  - <<: *static_analysis
+    name: "PyLint"
     install:
     - *upgrade_python_toolset
-    - pip install tox
+    - *install_deps
+    - pip install --upgrade "pylint >= 2.1"
     script:
-    - tox -e pep8,pep257
-    after_success: skip
+    - pylint sqlalchemy_jsonfield
+  - <<: *static_analysis
+    name: "Bandit"
+    install:
+    - *upgrade_python_toolset
+    - pip install --upgrade bandit
+    script:
+    - bandit -r sqlalchemy_jsonfield
+
+  - <<: *code_style_check
+    name: "PEP8"
+    install:
+    - *upgrade_python_toolset
+    - pip install --upgrade flake8
+    script:
+    - flake8
+  - <<: *code_style_check
+    name: "PEP257"
+    install:
+    - *upgrade_python_toolset
+    - pip install --upgrade pydocstyle
+    script:
+    - pydocstyle sqlalchemy_jsonfield
 
   - stage: deploy
     # This prevents job from appearing in test plan unless commit is tagged:
     if: tag IS present
     # Run on pypy to build not cythonized wheel
-    python: *pypy
+    <<: *pypy3
+    name: Build universal and cythonized bdist_wheel. Deploy bdist and sdist.
     services: []
     install:
     - *upgrade_python_toolset
+    - *install_deps
     script: []
     before_deploy:
-    - pip install sqlalchemy
+    - *build_package
     deploy:
     - provider: pypi
       skip_cleanup: true
