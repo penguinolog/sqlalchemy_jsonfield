@@ -75,7 +75,7 @@ jobs:
     install:
     - *upgrade_python_toolset
     - *install_deps
-    - pip install --upgrade "pylint >= 2.1"
+    - pip install --upgrade "pylint < 2.0"
     script:
     - pylint sqlalchemy_jsonfield
   - <<: *static_analysis
