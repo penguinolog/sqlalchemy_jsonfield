@@ -15,5 +15,9 @@
 
 from .jsonfield import JSONField, mutable_json_field
 
-__version__ = '0.7.1'
+__version__ = "0.7.1"
 __author__ = "Alexey Stepanov <penguinolog@gmail.com>"
+__author_email__ = "penguinolog@gmail.com"
+__url__ = "https://github.com/penguinolog/sqlalchemy_jsonfield"
+__description__ = "SQLALchemy JSONField implementation for storing dicts at SQL"
+__license__ = "Apache License, Version 2.0"

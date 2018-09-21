@@ -18,128 +18,74 @@ import sqlalchemy_jsonfield
 class BaseFunctionality(unittest.TestCase):
     def test_impl(self):
         # impl placeholder
-        self.assertIsInstance(
-            sqlalchemy_jsonfield.JSONField().impl,
-            sqlalchemy.types.TypeEngine
-        )
+        self.assertIsInstance(sqlalchemy_jsonfield.JSONField().impl, sqlalchemy.types.TypeEngine)
+
+        self.assertIsInstance(sqlalchemy_jsonfield.mutable_json_field().impl, sqlalchemy.types.TypeEngine)
 
         self.assertIsInstance(
-            sqlalchemy_jsonfield.mutable_json_field().impl,
-            sqlalchemy.types.TypeEngine
+            sqlalchemy_jsonfield.JSONField().load_dialect_impl(mysql.dialect()), sqlalchemy.types.JSON
         )
 
         self.assertIsInstance(
-            sqlalchemy_jsonfield.JSONField().load_dialect_impl(
-                mysql.dialect()
-            ),
-            sqlalchemy.types.JSON
+            sqlalchemy_jsonfield.mutable_json_field().load_dialect_impl(mysql.dialect()), sqlalchemy.types.JSON
         )
 
         self.assertIsInstance(
-            sqlalchemy_jsonfield.mutable_json_field().load_dialect_impl(
-                mysql.dialect()
-            ),
-            sqlalchemy.types.JSON
+            sqlalchemy_jsonfield.JSONField().load_dialect_impl(sqlite.dialect()), sqlalchemy.types.UnicodeText
         )
 
         self.assertIsInstance(
-            sqlalchemy_jsonfield.JSONField().load_dialect_impl(
-                sqlite.dialect()
-            ),
-            sqlalchemy.types.UnicodeText
+            sqlalchemy_jsonfield.mutable_json_field().load_dialect_impl(sqlite.dialect()), sqlalchemy.types.UnicodeText
         )
 
         self.assertIsInstance(
-            sqlalchemy_jsonfield.mutable_json_field().load_dialect_impl(
-                sqlite.dialect()
-            ),
-            sqlalchemy.types.UnicodeText
+            sqlalchemy_jsonfield.JSONField(enforce_string=True).load_dialect_impl(mysql.dialect()),
+            sqlalchemy.types.UnicodeText,
         )
 
         self.assertIsInstance(
-            sqlalchemy_jsonfield.JSONField(
-                enforce_string=True
-            ).load_dialect_impl(
-                mysql.dialect()
+            sqlalchemy_jsonfield.mutable_json_field(enforce_string=True).load_dialect_impl(mysql.dialect()),
+            sqlalchemy.types.UnicodeText,
+        )
+
+        self.assertEqual(
+            sqlalchemy_jsonfield.JSONField().process_bind_param({"key": "val"}, mysql.dialect()), {"key": "val"}
+        )
+
+        self.assertEqual(
+            sqlalchemy_jsonfield.JSONField().process_literal_param({"key": "val"}, mysql.dialect()), {"key": "val"}
+        )
+
+        self.assertEqual(
+            sqlalchemy_jsonfield.JSONField(enforce_string=True).process_bind_param({"key": "val"}, mysql.dialect()),
+            json.dumps({"key": "val"}),
+        )
+
+        self.assertEqual(
+            sqlalchemy_jsonfield.JSONField(enforce_string=True).process_bind_param({"key": "val"}, sqlite.dialect()),
+            json.dumps({"key": "val"}),
+        )
+
+        self.assertEqual(
+            sqlalchemy_jsonfield.JSONField(enforce_string=True, enforce_unicode=True).process_bind_param(
+                {"ключ": "значение"}, sqlite.dialect()
             ),
-            sqlalchemy.types.UnicodeText
+            json.dumps({"ключ": "значение"}, ensure_ascii=False),
         )
 
-        self.assertIsInstance(
-            sqlalchemy_jsonfield.mutable_json_field(
-                enforce_string=True
-            ).load_dialect_impl(
-                mysql.dialect()
+        self.assertEqual(
+            sqlalchemy_jsonfield.JSONField().process_result_value(json.dumps({"key": "val"}), mysql.dialect()),
+            json.dumps({"key": "val"}),
+        )
+
+        self.assertEqual(
+            sqlalchemy_jsonfield.JSONField(enforce_string=True).process_result_value(
+                json.dumps({"key": "val"}), mysql.dialect()
             ),
-            sqlalchemy.types.UnicodeText
+            {"key": "val"},
         )
 
         self.assertEqual(
-            sqlalchemy_jsonfield.JSONField().process_bind_param(
-                {'key': 'val'},
-                mysql.dialect()
-            ),
-            {'key': 'val'}
-        )
-
-        self.assertEqual(
-            sqlalchemy_jsonfield.JSONField().process_literal_param(
-                {'key': 'val'},
-                mysql.dialect()
-            ),
-            {'key': 'val'}
-        )
-
-        self.assertEqual(
-            sqlalchemy_jsonfield.JSONField(
-                enforce_string=True
-            ).process_bind_param(
-                {'key': 'val'},
-                mysql.dialect()
-            ),
-            json.dumps({'key': 'val'})
-        )
-
-        self.assertEqual(
-            sqlalchemy_jsonfield.JSONField(
-                enforce_string=True
-            ).process_bind_param(
-                {'key': 'val'},
-                sqlite.dialect()
-            ),
-            json.dumps({'key': 'val'})
-        )
-
-        self.assertEqual(
-            sqlalchemy_jsonfield.JSONField(
-                enforce_string=True,
-                enforce_unicode=True
-            ).process_bind_param(
-                {'ключ': 'значение'},
-                sqlite.dialect()
-            ),
-            json.dumps({'ключ': 'значение'}, ensure_ascii=False)
-        )
-
-        self.assertEqual(
-            sqlalchemy_jsonfield.JSONField().process_result_value(
-                json.dumps({'key': 'val'}),
-                mysql.dialect()),
-            json.dumps({'key': 'val'})
-        )
-
-        self.assertEqual(
-            sqlalchemy_jsonfield.JSONField(
-                enforce_string=True,
-            ).process_result_value(
-                json.dumps({'key': 'val'}),
-                mysql.dialect()),
-            {'key': 'val'}
-        )
-
-        self.assertEqual(
-            sqlalchemy_jsonfield.JSONField().process_result_value(
-                json.dumps({'key': 'val'}),
-                sqlite.dialect()),
-            {'key': 'val'}
+            sqlalchemy_jsonfield.JSONField().process_result_value(json.dumps({"key": "val"}), sqlite.dialect()),
+            {"key": "val"},
         )

@@ -19,12 +19,11 @@ import json
 import sqlalchemy.ext.mutable
 import sqlalchemy.types
 
-__all__ = ('JSONField', 'mutable_json_field')
+__all__ = ("JSONField", "mutable_json_field")
 
 
-# pylint: disable=abstract-method
 # noinspection PyAbstractClass
-class JSONField(sqlalchemy.types.TypeDecorator):
+class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-method
     """Represent an immutable structure as a json-encoded string or json.
 
     Usage::
@@ -40,13 +39,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):
     impl = sqlalchemy.types.TypeEngine  # Special placeholder
 
     def __init__(  # pylint: disable=keyword-arg-before-vararg
-            self,
-            enforce_string=False,
-            enforce_unicode=False,
-            json=json,
-            json_type=sqlalchemy.JSON,
-            *args,
-            **kwargs
+        self, enforce_string=False, enforce_unicode=False, json=json, json_type=sqlalchemy.JSON, *args, **kwargs
     ):
         """JSONField.
 
@@ -56,8 +49,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):
         :type enforce_unicode: bool
         :param json: JSON encoding/decoding library.
                      By default: standard json package.
-        :param json_type: the sqlalchemy/dialect class that will be
-                          used to render the DB JSON type.
+        :param json_type: the sqlalchemy/dialect class that will be used to render the DB JSON type.
                           By default: sqlalchemy.JSON
         """
         self.__enforce_string = enforce_string
@@ -68,9 +60,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):
 
     def __use_json(self, dialect):
         """Helper to determine, which encoder to use."""
-        return (
-            hasattr(dialect, '_json_serializer') and not self.__enforce_string
-        )
+        return hasattr(dialect, "_json_serializer") and not self.__enforce_string
 
     def load_dialect_impl(self, dialect):
         """Select impl by dialect."""
@@ -83,30 +73,18 @@ class JSONField(sqlalchemy.types.TypeDecorator):
         if self.__use_json(dialect) or value is None:
             return value
 
-        # pylint: disable=no-member
-        return self.__json_codec.dumps(
-            value,
-            ensure_ascii=not self.__enforce_unicode
-        )
-        # pylint: enable=no-member
+        return self.__json_codec.dumps(value, ensure_ascii=not self.__enforce_unicode)  # pylint: disable=no-member
 
     def process_result_value(self, value, dialect):
         """Decode data, if required."""
         if self.__use_json(dialect) or value is None:
             return value
 
-        # pylint: disable=no-member
-        return self.__json_codec.loads(value)
-        # pylint: enable=no-member
-# pylint: enable=abstract-method
+        return self.__json_codec.loads(value)  # pylint: disable=no-member
 
 
 def mutable_json_field(  # pylint: disable=keyword-arg-before-vararg
-    enforce_string=False,
-    enforce_unicode=False,
-    json=json,
-    *args,
-    **kwargs
+    enforce_string=False, enforce_unicode=False, json=json, *args, **kwargs
 ):
     """Mutable JSONField creator.
 
@@ -120,11 +98,5 @@ def mutable_json_field(  # pylint: disable=keyword-arg-before-vararg
     :rtype: JSONField
     """
     return sqlalchemy.ext.mutable.MutableDict.as_mutable(
-        JSONField(
-            enforce_string=enforce_string,
-            enforce_unicode=enforce_unicode,
-            json=json,
-            *args,
-            **kwargs
-        )
+        JSONField(enforce_string=enforce_string, enforce_unicode=enforce_unicode, json=json, *args, **kwargs)
     )

@@ -9,7 +9,7 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 
 [*.{py,ini}]
-max_line_length = 79
+max_line_length = 120
 
 [*.{yml,yaml,rst}]
 indent_size = 2
