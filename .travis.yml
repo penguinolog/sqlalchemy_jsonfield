@@ -71,6 +71,7 @@ jobs:
     <<: *pypy3
 
   - <<: *static_analysis
+    <<: *python36
     name: "PyLint"
     install:
     - *upgrade_python_toolset
