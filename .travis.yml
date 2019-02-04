@@ -111,9 +111,9 @@ jobs:
     install:
     - *upgrade_python_toolset
     - *install_deps
-    script: []
-    before_deploy:
+    script:
     - *build_package
+    before_deploy: []
     deploy:
     - provider: pypi
       skip_cleanup: true
@@ -124,6 +124,7 @@ jobs:
         tags: true
         distributions: sdist bdist_wheel
       skip_upload_docs: true
+      skip_existing: true
 
 cache: pip
 before_cache:
