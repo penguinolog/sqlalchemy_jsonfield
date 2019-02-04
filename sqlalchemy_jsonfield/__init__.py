@@ -13,9 +13,25 @@
 
 """Implement JSONField for SQLAlchemy."""
 
+import pkg_resources
+
 from .jsonfield import JSONField, mutable_json_field
 
-__version__ = "0.7.1"
+try:  # pragma: no cover
+    __version__ = pkg_resources.get_distribution(__name__).version
+except pkg_resources.DistributionNotFound:  # pragma: no cover
+    # package is not installed, try to get from SCM
+    try:
+        # noinspection PyPackageRequirements,PyUnresolvedReferences
+        import setuptools_scm  # type: ignore
+
+        __version__ = setuptools_scm.get_version()
+    except ImportError:
+        pass
+
+
+__all__ = ("JSONField", "mutable_json_field")
+
 __author__ = "Alexey Stepanov <penguinolog@gmail.com>"
 __author_email__ = "penguinolog@gmail.com"
 __url__ = "https://github.com/penguinolog/sqlalchemy_jsonfield"
