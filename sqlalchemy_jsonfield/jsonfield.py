@@ -23,9 +23,9 @@ import sqlalchemy.ext.mutable
 import sqlalchemy.types
 
 if typing.TYPE_CHECKING:
-    import types
-    from sqlalchemy.engine.default import DefaultDialect
-    from sqlalchemy.sql.type_api import TypeEngine
+    import types  # noqa: F401  # pylint: disable=unused-import
+    from sqlalchemy.engine.default import DefaultDialect  # noqa: F401  # pylint: disable=unused-import
+    from sqlalchemy.sql.type_api import TypeEngine  # noqa: F401  # pylint: disable=unused-import
 
 __all__ = ("JSONField", "mutable_json_field")
 
