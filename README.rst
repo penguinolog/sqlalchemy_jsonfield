@@ -32,6 +32,8 @@ some of them (SQLite, Percona & MariaDB) requires data conversion to Text (not V
 As addition, we have different levels of Unicode support on database and connector side,
 so we may be interested to switch JSON encoding between deployments.
 
+.. note:: SQLite 3.9 supports JSON natively and SQLAlchemy can handle this.
+
 Solution:
 ---------
 

@@ -37,7 +37,7 @@ class ExampleTable(Base):
 
 
 class SQLIteTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self):  # type: () -> None
         if os.path.exists(db_path):
             os.remove(db_path)
 
@@ -49,7 +49,7 @@ class SQLIteTests(unittest.TestCase):
         Session = sqlalchemy.orm.sessionmaker(engine)
         self.session = Session()
 
-    def test_create(self):
+    def test_create(self):  # type: () -> None
         """Check column type"""
         # noinspection PyArgumentList
         with sqlite3.connect(database="file:{}?mode=ro".format(db_path), uri=True) as conn:
@@ -63,13 +63,13 @@ class SQLIteTests(unittest.TestCase):
 
         json_record = columns["json_record"]
 
-        self.assertEqual(
+        self.assertIn(
             json_record["type"],
-            "TEXT",
-            "Unexpected column type: received: {!s}, expected: TEXT".format(json_record["type"]),
+            ("TEXT", "JSON"),
+            "Unexpected column type: received: {!s}, expected: TEXT|JSON".format(json_record["type"]),
         )
 
-    def test_operate(self):
+    def test_operate(self):  # type: () -> None
         """Check column data operation"""
         test_dict = {"key": "value"}
         test_list = ["item0", "item1"]

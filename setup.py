@@ -30,6 +30,9 @@ with open(os.path.join(os.path.dirname(__file__), "sqlalchemy_jsonfield", "__ini
 with open("README.rst") as f:
     long_description = f.read()
 
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+
 
 # noinspection PyUnresolvedReferences
 def get_simple_vars_from_src(src):
@@ -152,5 +155,5 @@ setuptools.setup(
         "setuptools_scm",
     ],
     use_scm_version=True,
-    install_requires=["sqlalchemy", ],
+    install_requires=required,
 )

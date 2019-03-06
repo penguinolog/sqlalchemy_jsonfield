@@ -13,9 +13,12 @@
 
 """Implement JSONField for SQLAlchemy."""
 
+# External Dependencies
 import pkg_resources
 
-from .jsonfield import JSONField, mutable_json_field
+# Local Implementation
+from .jsonfield import JSONField
+from .jsonfield import mutable_json_field
 
 try:  # pragma: no cover
     __version__ = pkg_resources.get_distribution(__name__).version

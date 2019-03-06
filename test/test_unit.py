@@ -16,7 +16,7 @@ import sqlalchemy_jsonfield
 
 # noinspection PyStatementEffect
 class BaseFunctionality(unittest.TestCase):
-    def test_impl(self):
+    def test_impl(self):  # type: () -> None
         # impl placeholder
         self.assertIsInstance(sqlalchemy_jsonfield.JSONField().impl, sqlalchemy.types.TypeEngine)
 
@@ -28,14 +28,6 @@ class BaseFunctionality(unittest.TestCase):
 
         self.assertIsInstance(
             sqlalchemy_jsonfield.mutable_json_field().load_dialect_impl(mysql.dialect()), sqlalchemy.types.JSON
-        )
-
-        self.assertIsInstance(
-            sqlalchemy_jsonfield.JSONField().load_dialect_impl(sqlite.dialect()), sqlalchemy.types.UnicodeText
-        )
-
-        self.assertIsInstance(
-            sqlalchemy_jsonfield.mutable_json_field().load_dialect_impl(sqlite.dialect()), sqlalchemy.types.UnicodeText
         )
 
         self.assertIsInstance(
@@ -82,10 +74,5 @@ class BaseFunctionality(unittest.TestCase):
             sqlalchemy_jsonfield.JSONField(enforce_string=True).process_result_value(
                 json.dumps({"key": "val"}), mysql.dialect()
             ),
-            {"key": "val"},
-        )
-
-        self.assertEqual(
-            sqlalchemy_jsonfield.JSONField().process_result_value(json.dumps({"key": "val"}), sqlite.dialect()),
             {"key": "val"},
         )

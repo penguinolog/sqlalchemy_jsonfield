@@ -14,10 +14,18 @@
 
 """JSONField implementation for SQLAlchemy."""
 
+# Standard Library
 import json
+import typing
 
+# External Dependencies
 import sqlalchemy.ext.mutable
 import sqlalchemy.types
+
+if typing.TYPE_CHECKING:
+    import types
+    from sqlalchemy.engine.default import DefaultDialect
+    from sqlalchemy.sql.type_api import TypeEngine
 
 __all__ = ("JSONField", "mutable_json_field")
 
@@ -32,23 +40,28 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
 
     """
 
-    def process_literal_param(self, value, dialect):
+    def process_literal_param(self, value, dialect):  # type: (typing.Any, DefaultDialect) -> typing.Any
         """Re-use of process_bind_param."""
         return self.process_bind_param(value, dialect)
 
     impl = sqlalchemy.types.TypeEngine  # Special placeholder
 
     def __init__(  # pylint: disable=keyword-arg-before-vararg
-        self, enforce_string=False, enforce_unicode=False, json=json, json_type=sqlalchemy.JSON, *args, **kwargs
-    ):
+        self,
+        enforce_string=False,  # type: bool
+        enforce_unicode=False,  # type: bool
+        json=json,  # type: typing.Union[types.ModuleType, typing.Any]
+        json_type=sqlalchemy.JSON,  # type: TypeEngine
+        *args,  # type: typing.Any
+        **kwargs  # type: typing.Any
+    ):  # type: (...) -> None
         """JSONField.
 
         :param enforce_string: enforce String(UnicodeText) type usage
         :type enforce_string: bool
         :param enforce_unicode: do not encode non-ascii data
         :type enforce_unicode: bool
-        :param json: JSON encoding/decoding library.
-                     By default: standard json package.
+        :param json: JSON encoding/decoding library. By default: standard json package.
         :param json_type: the sqlalchemy/dialect class that will be used to render the DB JSON type.
                           By default: sqlalchemy.JSON
         """
@@ -58,24 +71,28 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
         self.__json_type = json_type
         super(JSONField, self).__init__(*args, **kwargs)
 
-    def __use_json(self, dialect):
+    def __use_json(self, dialect):  # type: (DefaultDialect) -> bool
         """Helper to determine, which encoder to use."""
         return hasattr(dialect, "_json_serializer") and not self.__enforce_string
 
-    def load_dialect_impl(self, dialect):
+    def load_dialect_impl(self, dialect):  # type: (DefaultDialect) -> TypeEngine
         """Select impl by dialect."""
         if self.__use_json(dialect):
             return dialect.type_descriptor(self.__json_type)
         return dialect.type_descriptor(sqlalchemy.UnicodeText)
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, value, dialect):  # type: (typing.Any, DefaultDialect) -> typing.Union[str, typing.Any]
         """Encode data, if required."""
         if self.__use_json(dialect) or value is None:
             return value
 
         return self.__json_codec.dumps(value, ensure_ascii=not self.__enforce_unicode)  # pylint: disable=no-member
 
-    def process_result_value(self, value, dialect):
+    def process_result_value(
+        self,
+        value,  # type: typing.Union[str, typing.Any]
+        dialect  # type: DefaultDialect
+    ):  # type: (...) -> typing.Any
         """Decode data, if required."""
         if self.__use_json(dialect) or value is None:
             return value
@@ -84,8 +101,12 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
 
 
 def mutable_json_field(  # pylint: disable=keyword-arg-before-vararg
-    enforce_string=False, enforce_unicode=False, json=json, *args, **kwargs
-):
+    enforce_string=False,  # type: bool
+    enforce_unicode=False,  # type: bool
+    json=json,  # type: typing.Union[types.ModuleType, typing.Any]
+    *args,  # type: typing.Any
+    **kwargs  # type: typing.Any
+):  # type: (...) -> JSONField
     """Mutable JSONField creator.
 
     :param enforce_string: enforce String(UnicodeText) type usage
