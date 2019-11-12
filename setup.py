@@ -14,15 +14,19 @@
 
 """SQLAlchemy JSONField implementation"""
 
+# Standard Library
 import ast
 import collections
 import os.path
 import sys
 
+# External Dependencies
 import setuptools
 
-PY3 = sys.version_info[:2] > (2, 7)
-PY34 = sys.version_info[:2] > (3, 3)
+try:
+    import typing
+except ImportError:
+    typing = None
 
 with open(os.path.join(os.path.dirname(__file__), "sqlalchemy_jsonfield", "__init__.py")) as f:
     source = f.read()
@@ -35,7 +39,9 @@ with open('requirements.txt') as f:
 
 
 # noinspection PyUnresolvedReferences
-def get_simple_vars_from_src(src):
+def get_simple_vars_from_src(
+    src: str
+) -> "typing.Dict[str, typing.Union[str, bytes, int, float, complex, list, set, dict, tuple, None, bool, Ellipsis]]":
     """Get simple (string/number/boolean and None) assigned values from source.
 
     :param src: Source code
@@ -47,7 +53,7 @@ def get_simple_vars_from_src(src):
                     str, bytes,
                     int, float, complex,
                     list, set, dict, tuple,
-                    None,
+                    None, bool, Ellipsis
                 ]
             ]
 
@@ -81,11 +87,10 @@ def get_simple_vars_from_src(src):
     >>> get_simple_vars_from_src(multiple_assign)
     OrderedDict([('e', 1), ('f', 1), ('g', 1)])
     """
-    ast_data = (ast.Str, ast.Num, ast.List, ast.Set, ast.Dict, ast.Tuple)
-    if PY3:
-        ast_data += (ast.Bytes,)
-    if PY34:
-        ast_data += (ast.NameConstant,)
+    if sys.version_info[:2] < (3, 8):
+        ast_data = (ast.Str, ast.Num, ast.List, ast.Set, ast.Dict, ast.Tuple, ast.Bytes, ast.NameConstant, ast.Ellipsis)
+    else:
+        ast_data = (ast.Constant, ast.List, ast.Set, ast.Dict, ast.Tuple)
 
     tree = ast.parse(src)
 
@@ -96,10 +101,6 @@ def get_simple_vars_from_src(src):
             continue
         try:
             if isinstance(node.value, ast_data):
-                value = ast.literal_eval(node.value)
-            elif isinstance(node.value, ast.Name) and isinstance(  # NameConstant in python < 3.4
-                node.value.ctx, ast.Load  # Read constant
-            ):
                 value = ast.literal_eval(node.value)
             else:
                 continue
@@ -118,13 +119,11 @@ classifiers = [
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "License :: OSI Approved :: Apache Software License",
-    "Programming Language :: Python :: 2",
-    "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.4",
     "Programming Language :: Python :: 3.5",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
@@ -141,7 +140,7 @@ setuptools.setup(
     long_description=long_description,
     classifiers=classifiers,
     keywords=keywords,
-    python_requires=">=2.7.5,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*",
+    python_requires=">=3.5.0",
     # While setuptools cannot deal with pre-installed incompatible versions,
     # setting a lower bound is not harmful - it makes error messages cleaner. DO
     # NOT set an upper bound on setuptools, as that will lead to uninstallable

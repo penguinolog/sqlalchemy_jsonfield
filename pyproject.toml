@@ -11,7 +11,7 @@ build-backend="setuptools.build_meta"
 [tool.black]
 line-length = 120
 safe = true
-py36 = false
+target-version = ["py35", "py36", "py37", "py38"]
 
 [tool.isort]
 line_length = 120

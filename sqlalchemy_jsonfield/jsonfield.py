@@ -16,6 +16,7 @@
 
 # Standard Library
 import json
+import types
 import typing
 
 # External Dependencies
@@ -23,9 +24,8 @@ import sqlalchemy.ext.mutable
 import sqlalchemy.types
 
 if typing.TYPE_CHECKING:
-    import types  # noqa: F401  # pylint: disable=unused-import
-    from sqlalchemy.engine.default import DefaultDialect  # noqa: F401  # pylint: disable=unused-import
-    from sqlalchemy.sql.type_api import TypeEngine  # noqa: F401  # pylint: disable=unused-import
+    from sqlalchemy.engine.default import DefaultDialect  # noqa: F401
+    from sqlalchemy.sql.type_api import TypeEngine  # noqa: F401
 
 __all__ = ("JSONField", "mutable_json_field")
 
@@ -40,7 +40,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
 
     """
 
-    def process_literal_param(self, value, dialect):  # type: (typing.Any, DefaultDialect) -> typing.Any
+    def process_literal_param(self, value: typing.Any, dialect: "DefaultDialect") -> typing.Any:
         """Re-use of process_bind_param."""
         return self.process_bind_param(value, dialect)
 
@@ -48,13 +48,13 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
 
     def __init__(  # pylint: disable=keyword-arg-before-vararg
         self,
-        enforce_string=False,  # type: bool
-        enforce_unicode=False,  # type: bool
-        json=json,  # type: typing.Union[types.ModuleType, typing.Any]
-        json_type=sqlalchemy.JSON,  # type: TypeEngine
-        *args,  # type: typing.Any
-        **kwargs  # type: typing.Any
-    ):  # type: (...) -> None
+        enforce_string: bool = False,
+        enforce_unicode: bool = False,
+        json: typing.Union[types.ModuleType, typing.Any] = json,  # pylint: disable=redefined-outer-name
+        json_type: "TypeEngine" = sqlalchemy.JSON,
+        *args: typing.Any,
+        **kwargs: typing.Any
+    ) -> None:
         """JSONField.
 
         :param enforce_string: enforce String(UnicodeText) type usage
@@ -64,6 +64,10 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
         :param json: JSON encoding/decoding library. By default: standard json package.
         :param json_type: the sqlalchemy/dialect class that will be used to render the DB JSON type.
                           By default: sqlalchemy.JSON
+        :param args: extra baseclass arguments
+        :type args: typing.Any
+        :param kwargs: extra baseclass keyworded arguments
+        :type kwargs: typing.Any
         """
         self.__enforce_string = enforce_string
         self.__enforce_unicode = enforce_unicode
@@ -71,42 +75,38 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
         self.__json_type = json_type
         super(JSONField, self).__init__(*args, **kwargs)
 
-    def __use_json(self, dialect):  # type: (DefaultDialect) -> bool
+    def __use_json(self, dialect: "DefaultDialect") -> bool:
         """Helper to determine, which encoder to use."""
         return hasattr(dialect, "_json_serializer") and not self.__enforce_string
 
-    def load_dialect_impl(self, dialect):  # type: (DefaultDialect) -> TypeEngine
+    def load_dialect_impl(self, dialect: "DefaultDialect") -> "TypeEngine":
         """Select impl by dialect."""
         if self.__use_json(dialect):
             return dialect.type_descriptor(self.__json_type)
         return dialect.type_descriptor(sqlalchemy.UnicodeText)
 
-    def process_bind_param(self, value, dialect):  # type: (typing.Any, DefaultDialect) -> typing.Union[str, typing.Any]
+    def process_bind_param(self, value: typing.Any, dialect: "DefaultDialect") -> typing.Union[str, typing.Any]:
         """Encode data, if required."""
         if self.__use_json(dialect) or value is None:
             return value
 
-        return self.__json_codec.dumps(value, ensure_ascii=not self.__enforce_unicode)  # pylint: disable=no-member
+        return self.__json_codec.dumps(value, ensure_ascii=not self.__enforce_unicode)
 
-    def process_result_value(
-        self,
-        value,  # type: typing.Union[str, typing.Any]
-        dialect  # type: DefaultDialect
-    ):  # type: (...) -> typing.Any
+    def process_result_value(self, value: typing.Union[str, typing.Any], dialect: "DefaultDialect") -> typing.Any:
         """Decode data, if required."""
         if self.__use_json(dialect) or value is None:
             return value
 
-        return self.__json_codec.loads(value)  # pylint: disable=no-member
+        return self.__json_codec.loads(value)
 
 
-def mutable_json_field(  # pylint: disable=keyword-arg-before-vararg
-    enforce_string=False,  # type: bool
-    enforce_unicode=False,  # type: bool
-    json=json,  # type: typing.Union[types.ModuleType, typing.Any]
-    *args,  # type: typing.Any
-    **kwargs  # type: typing.Any
-):  # type: (...) -> JSONField
+def mutable_json_field(  # pylint: disable=keyword-arg-before-vararg, redefined-outer-name
+    enforce_string: bool = False,
+    enforce_unicode: bool = False,
+    json: typing.Union[types.ModuleType, typing.Any] = json,
+    *args: typing.Any,
+    **kwargs: typing.Any
+) -> JSONField:
     """Mutable JSONField creator.
 
     :param enforce_string: enforce String(UnicodeText) type usage
@@ -115,6 +115,10 @@ def mutable_json_field(  # pylint: disable=keyword-arg-before-vararg
     :type enforce_unicode: bool
     :param json: JSON encoding/decoding library.
                  By default: standard json package.
+    :param args: extra baseclass arguments
+    :type args: typing.Any
+    :param kwargs: extra baseclass keyworded arguments
+    :type kwargs: typing.Any
     :return: Mutable JSONField via MutableDict.as_mutable
     :rtype: JSONField
     """

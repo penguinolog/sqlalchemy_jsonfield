@@ -3,14 +3,36 @@ source =
     sqlalchemy_jsonfield
 omit =
     test/*
-
+branch = True
 [report]
 exclude_lines =
-    # Have to re-enable the standard pragma
-    pragma: no cover
+  # Have to re-enable the standard pragma
+  pragma: no cover
 
-    # Don't complain about missing debug-only code:
-    def __repr__
+  # Don't complain about missing debug-only code:
+  def __repr__
 
-    # Don't complain if non-runnable code isn't run:
-    if __name__ == .__main__.:
+  # Don't complain if tests don't hit defensive assertion code:
+  raise NotImplementedError
+
+  # Exclude methods marked as abstract
+  @abstractmethod
+
+  # Exclude import statements
+  ^from\b
+  ^import\b
+
+  # Exclude variable declarations that are executed when file is loaded
+  ^[a-zA-Z_]+\b\s=
+
+  # Code for static analysis is never covered:
+  if typing.TYPE_CHECKING:
+
+  # Fallback code with no installed deps is almost impossible to cover properly
+  except ImportError:
+
+  # Don't complain if non-runnable code isn't run:
+  if __name__ == .__main__.:
+
+  # OS Specific
+  if platform.system()

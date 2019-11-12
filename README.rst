@@ -51,11 +51,10 @@ Pros:
 
 ::
 
-    Python 2.7
-    Python 3.4
     Python 3.5
     Python 3.6
     Python 3.7
+    Python 3.8
     PyPy
     PyPy3
 
@@ -118,12 +117,10 @@ Test environments available:
 ::
 
     pep8
-    py27
-    py34
     py35
     py36
     py37
-    pypy
+    py38
     pypy3
     pylint
     docs

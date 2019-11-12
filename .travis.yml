@@ -8,12 +8,6 @@ install:
 - pip install --upgrade pytest-cov coveralls
 
 _python:
-- &python27
-  name: "Python 2.7"
-  python: "2.7"
-- &python34
-  name: "Python 3.4"
-  python: "3.4"
 - &python35
   name: "Python 3.5"
   python: "3.5"
@@ -25,16 +19,18 @@ _python:
   python: "3.7"
   dist: xenial
   sudo: true
-- &pypy
-  name: "PyPy"
-  python: "pypy"
+- &python38
+  name: "Python 3.8"
+  python: "3.8"
+  dist: xenial
+  sudo: true
 - &pypy3
   name: "PyPy3"
-  python: "pypy3.5"
+  python: "pypy3"
 
 _helpers:
 - &build_package python setup.py bdist_wheel
-  
+
 - &static_analysis
   stage: Static analysis
   <<: *python37
@@ -79,17 +75,13 @@ jobs:
     - flake8
 
   - stage: test
-    <<: *python27
-  - stage: test
-    <<: *python34
-  - stage: test
     <<: *python35
   - stage: test
     <<: *python36
   - stage: test
     <<: *python37
   - stage: test
-    <<: *pypy
+    <<: *python38
   - stage: test
     <<: *pypy3
 
