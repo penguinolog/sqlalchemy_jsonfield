@@ -51,12 +51,11 @@ after_success:
 jobs:
   include:
   - <<: *static_analysis
-    <<: *python36
     name: "PyLint"
     install:
     - *upgrade_python_toolset
     - *install_deps
-    - pip install --upgrade "pylint < 2.0"
+    - pip install --upgrade pylint
     script:
     - pylint sqlalchemy_jsonfield
   - <<: *static_analysis
