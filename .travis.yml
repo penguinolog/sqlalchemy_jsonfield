@@ -114,13 +114,14 @@ jobs:
         - provider: pypi
           # `skip_cleanup: true` is required to preserve binary wheels, built
           skip_cleanup: true
-          user: penguinolog
+          cleanup: false
+          username: penguinolog
           password:
             secure: "d7LUin2jil3ZHyu8W+nXwPpZISSD12/LJVenG1kySvuZ+hV5ovknhKcrEV4IOkyRlGVb/SEbCM60FExGobGn2goAhtv15tTve0KSmDfHbK0YZG7gPwQykFnuS3tOCoo4E4Pxjp17cgmvVuHJDWy546J6w+PGq+hfEL0xFPNR6lZNMd3+HqVnA0XsCbZcuOWFZuDQL4CQIgR1wxgqnD6PMun4P9xBt9C2clJWo6MDy5AaqO0qGodbyIare+c6MPrxluTBnE1ULzGLyn0+lj+V+UP8SyfVfrxp2CokOqs2NbTwuZHrvJu9mOJG3xRTYjyIBrUlWdiTejzDlJ3annqTaxemiFUq6KYLBcHqbugnPtPtqDt47Y9v0DBeJ/OTxZ8B2lFOD4r2IuAcQLkDLvCeESy4SLWDcDcHds6Czj3UIHQ2rB2XgzxYOHz1cpj4ZF84NNYSC0zIEUPXKG8iS2xmnlRHLrgd3jzKct+TaKzuOjN4EHjzea5Yzz6GHySt+EhgABVExste90fp0k7NJ8ipsa+GROMVOzKeYuj+h0djSTRzBxorX32Lisq+X6TXalXTvDup67/IJN9CYmDMPk+yxYqGhhuKUgj19+87dbW2DTCV+5eRxO2J7QMr20cZWLZnLR7tEJl6SPfLITcIBTDh3foa1wQgyJSwLTFoH/wOda4="
           on:
             tags: true
-            distributions: sdist bdist_wheel
-          skip_upload_docs: true
+          distributions: sdist bdist_wheel
+          upload_docs: false
           skip_existing: true
 
 cache: pip
