@@ -1,13 +1,17 @@
 ### Test results
 /*_result*.xml
 /report.html
+/mypy_report
 /assets/*
 .cache/*
 .pytest_cache/*
 
+### Generated version
+/sqlalchemy_jsonfield/_version.py
+
 ### Generated code
 /sqlalchemy_jsonfield/*.c
-
+/pip-wheel-metadata
 ### TortoiseGit template
 # Project-level settings
 /.tgitconfig

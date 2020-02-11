@@ -28,14 +28,16 @@ try:
 except ImportError:
     typing = None
 
-with open(os.path.join(os.path.dirname(__file__), "sqlalchemy_jsonfield", "__init__.py")) as f:
-    source = f.read()
+PACKAGE_NAME = "sqlalchemy_jsonfield"
+
+with open(os.path.join(os.path.dirname(__file__), PACKAGE_NAME, "__init__.py")) as f:
+    SOURCE = f.read()
+
+with open("requirements.txt") as f:
+    REQUIRED = f.read().splitlines()
 
 with open("README.rst") as f:
-    long_description = f.read()
-
-with open('requirements.txt') as f:
-    required = f.read().splitlines()
+    LONG_DESCRIPTION = f.read()
 
 
 # noinspection PyUnresolvedReferences
@@ -46,7 +48,7 @@ def get_simple_vars_from_src(
 
     :param src: Source code
     :type src: str
-    :returns: OrderedDict with keys, values = variable names, values
+    :return: OrderedDict with keys, values = variable names, values
     :rtype: typing.Dict[
                 str,
                 typing.Union[
@@ -112,9 +114,9 @@ def get_simple_vars_from_src(
     return result
 
 
-variables = get_simple_vars_from_src(source)
+VARIABLES = get_simple_vars_from_src(SOURCE)
 
-classifiers = [
+CLASSIFIERS = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -129,18 +131,18 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 
-keywords = ["sql", "sqlalchemy", "json", "jsonfield", "development"]
+KEYWORDS = ["sql", "sqlalchemy", "json", "jsonfield", "development"]
 
 setuptools.setup(
     name="SQLAlchemy-JSONField",
-    author=variables["__author__"],
-    author_email=variables["__author_email__"],
-    url=variables["__url__"],
-    license=variables["__license__"],
-    description=variables["__description__"],
-    long_description=long_description,
-    classifiers=classifiers,
-    keywords=keywords,
+    author=VARIABLES["__author__"],
+    author_email=VARIABLES["__author_email__"],
+    url=VARIABLES["__url__"],
+    license=VARIABLES["__license__"],
+    description=VARIABLES["__description__"],
+    long_description=LONG_DESCRIPTION,
+    classifiers=CLASSIFIERS,
+    keywords=KEYWORDS,
     python_requires=">=3.5.0",
     # While setuptools cannot deal with pre-installed incompatible versions,
     # setting a lower bound is not harmful - it makes error messages cleaner. DO
@@ -152,8 +154,9 @@ setuptools.setup(
         "setuptools >= 21.0.0,!=24.0.0,"
         "!=34.0.0,!=34.0.1,!=34.0.2,!=34.0.3,!=34.1.0,!=34.1.1,!=34.2.0,!=34.3.0,!=34.3.1,!=34.3.2,"
         "!=36.2.0",
-        "setuptools_scm",
+        "wheel",
+        "setuptools_scm[toml]>=3.4",
     ],
-    use_scm_version=True,
-    install_requires=required,
+    use_scm_version={"write_to": '{PACKAGE_NAME}/_version.py'.format(PACKAGE_NAME=PACKAGE_NAME)},
+    install_requires=REQUIRED,
 )

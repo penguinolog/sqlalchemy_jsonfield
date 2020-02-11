@@ -41,7 +41,11 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
     """
 
     def process_literal_param(self, value: typing.Any, dialect: "DefaultDialect") -> typing.Any:
-        """Re-use of process_bind_param."""
+        """Re-use of process_bind_param.
+
+        :return: encoded value if required
+        :rtype: typing.Union[str, typing.Any]
+        """
         return self.process_bind_param(value, dialect)
 
     impl = sqlalchemy.types.TypeEngine  # Special placeholder
@@ -76,24 +80,40 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
         super(JSONField, self).__init__(*args, **kwargs)
 
     def __use_json(self, dialect: "DefaultDialect") -> bool:
-        """Helper to determine, which encoder to use."""
+        """Helper to determine, which encoder to use.
+
+        :return: use engine-based json encoder
+        :rtype: bool
+        """
         return hasattr(dialect, "_json_serializer") and not self.__enforce_string
 
     def load_dialect_impl(self, dialect: "DefaultDialect") -> "TypeEngine":
-        """Select impl by dialect."""
+        """Select impl by dialect.
+
+        :return: dialect implementation depends of decoding method
+        :rtype: TypeEngine
+        """
         if self.__use_json(dialect):
             return dialect.type_descriptor(self.__json_type)
         return dialect.type_descriptor(sqlalchemy.UnicodeText)
 
     def process_bind_param(self, value: typing.Any, dialect: "DefaultDialect") -> typing.Union[str, typing.Any]:
-        """Encode data, if required."""
+        """Encode data, if required.
+
+        :return: encoded value if required
+        :rtype: typing.Union[str, typing.Any]
+        """
         if self.__use_json(dialect) or value is None:
             return value
 
         return self.__json_codec.dumps(value, ensure_ascii=not self.__enforce_unicode)
 
     def process_result_value(self, value: typing.Union[str, typing.Any], dialect: "DefaultDialect") -> typing.Any:
-        """Decode data, if required."""
+        """Decode data, if required.
+
+        :return: decoded result value if required
+        :rtype: typing.Any
+        """
         if self.__use_json(dialect) or value is None:
             return value
 

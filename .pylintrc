@@ -3,11 +3,11 @@
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code.
-extension-pkg-whitelist=
+extension-pkg-whitelist=lxml.etree
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS
+ignore=CVS,.git
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
@@ -19,7 +19,7 @@ ignore-patterns=_version.py
 
 # Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
 # number of processors available to use.
-jobs=1
+jobs=0
 
 # Control the amount of potential inferred values when inferring a single
 # object. This can help the performance when dealing with large functions or
@@ -30,7 +30,10 @@ limit-inference-results=100
 # usually to register additional checkers.
 load-plugins=pylint.extensions.docparams,
              pylint.extensions.docstyle,
-             pylint.extensions.overlapping_exceptions
+             pylint.extensions.overlapping_exceptions,
+             pylint.extensions.emptystring,
+             pylint.extensions.comparetozero,
+             pylint.extensions.check_elif
 
 # Pickle collected data for later comparisons.
 persistent=yes
@@ -69,7 +72,6 @@ disable=non-ascii-bytes-literal,
         locally-disabled,
         file-ignored,
         suppressed-message,
-        comprehension-escape,
         similarities,
         too-many-ancestors,
         too-few-public-methods,
@@ -524,11 +526,11 @@ accept-no-raise-doc=no
 
 # Whether to accept totally missing return documentation in the docstring of a
 # function that returns a statement.
-accept-no-return-doc=yes
+accept-no-return-doc=no
 
 # Whether to accept totally missing yields documentation in the docstring of a
 # generator.
-accept-no-yields-doc=yes
+accept-no-yields-doc=no
 
 # If the docstring type cannot be guessed the specified docstring type will be
 # used.
