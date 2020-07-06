@@ -47,7 +47,7 @@ Pros:
 * Open Source: https://github.com/penguinolog/sqlalchemy_jsonfield
 * Self-documented code: docstrings with types in comments
 * Uses native JSON by default, but allows to specify different library.
-* Support miltiple Python versions:
+* Support multiple Python versions:
 
 ::
 
