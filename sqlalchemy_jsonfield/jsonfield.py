@@ -24,6 +24,7 @@ import sqlalchemy.ext.mutable
 import sqlalchemy.types
 
 if typing.TYPE_CHECKING:
+    # External Dependencies
     from sqlalchemy.engine.default import DefaultDialect  # noqa: F401
     from sqlalchemy.sql.type_api import TypeEngine  # noqa: F401
 

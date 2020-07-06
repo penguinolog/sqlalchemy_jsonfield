@@ -18,6 +18,7 @@ from .jsonfield import JSONField
 from .jsonfield import mutable_json_field
 
 try:
+    # Local Implementation
     from ._version import version as __version__
 except ImportError:
     pass
