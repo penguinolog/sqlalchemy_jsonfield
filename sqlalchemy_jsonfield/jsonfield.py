@@ -78,7 +78,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
         self.__enforce_unicode = enforce_unicode
         self.__json_codec = json
         self.__json_type = json_type
-        super(JSONField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __use_json(self, dialect: "DefaultDialect") -> bool:
         """Helper to determine, which encoder to use.
