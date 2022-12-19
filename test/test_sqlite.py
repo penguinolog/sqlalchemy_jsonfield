@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 # Standard Library
-import datetime
 import os.path
 import sqlite3
+import sys
 import tempfile
 import unittest
 
@@ -40,8 +40,8 @@ class ExampleTable(Base):
 class SQLIteTests(unittest.TestCase):
     def setUp(self) -> None:
         # Path to test database
-        time_component = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
-        self.db_path = os.path.join(tempfile.gettempdir(), f"test.sqlite3_{time_component}")
+        sys_info = sys.implementation.name + "_" + ".".join(sys.version_info[:3])
+        self.db_path = os.path.join(tempfile.gettempdir(), f"test.sqlite3_{sys_info}")
 
         if os.path.exists(self.db_path):
             os.remove(self.db_path)
