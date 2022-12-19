@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 # Standard Library
+import datetime
 import os.path
 import sqlite3
 import tempfile
@@ -21,9 +22,6 @@ except ImportError:
 # Package Implementation
 import sqlalchemy_jsonfield
 
-# Path to test database
-db_path = os.path.join(tempfile.gettempdir(), "test.sqlite3")
-
 # Table name
 table_name = "create_test"
 
@@ -41,10 +39,13 @@ class ExampleTable(Base):
 
 class SQLIteTests(unittest.TestCase):
     def setUp(self) -> None:
-        if os.path.exists(db_path):
-            os.remove(db_path)
+        # Path to test database
+        self.db_path = os.path.join(tempfile.gettempdir(), f"test.sqlite3_{datetime.datetime.utcnow()}")
 
-        engine = sqlalchemy.create_engine(f"sqlite:///{db_path}", echo=False)
+        if os.path.exists(self.db_path):
+            os.remove(self.db_path)
+
+        engine = sqlalchemy.create_engine(f"sqlite:///{self.db_path}", echo=False)
 
         Base.metadata.create_all(engine)
 
@@ -52,10 +53,14 @@ class SQLIteTests(unittest.TestCase):
         Session = sqlalchemy.orm.sessionmaker(engine)
         self.session = Session()
 
+    def tearDown(self) -> None:
+        if os.path.exists(self.db_path):
+            os.remove(self.db_path)
+
     def test_create(self) -> None:
         """Check column type"""
         # noinspection PyArgumentList
-        with sqlite3.connect(database=f"file:{db_path}?mode=ro", uri=True) as conn:
+        with sqlite3.connect(database=f"file:{self.db_path}?mode=ro", uri=True) as conn:
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
             c.execute(f"PRAGMA TABLE_INFO({table_name})")
@@ -108,7 +113,7 @@ class SQLIteTests(unittest.TestCase):
         # Low level
 
         # noinspection PyArgumentList
-        with sqlite3.connect(database=f"file:{db_path}?mode=ro", uri=True) as conn:
+        with sqlite3.connect(database=f"file:{self.db_path}?mode=ro", uri=True) as conn:
             c = conn.cursor()
             c.execute(f"SELECT row_name, json_record FROM {table_name}")
 
