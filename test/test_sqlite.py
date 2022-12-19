@@ -40,7 +40,9 @@ class ExampleTable(Base):
 class SQLIteTests(unittest.TestCase):
     def setUp(self) -> None:
         # Path to test database
-        sys_info = sys.implementation.name + "_" + ".".join(sys.version_info[:3])
+        sys_info = (
+            f"{sys.implementation.name}_{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+        )
         self.db_path = os.path.join(tempfile.gettempdir(), f"test.sqlite3_{sys_info}")
 
         if os.path.exists(self.db_path):
