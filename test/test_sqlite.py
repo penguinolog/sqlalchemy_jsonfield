@@ -44,6 +44,7 @@ class SQLIteTests(unittest.TestCase):
             f"{sys.implementation.name}_{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
         )
         self.db_path = os.path.join(tempfile.gettempdir(), f"test.sqlite3_{sys_info}")
+        self.session = None
 
         if os.path.exists(self.db_path):
             os.remove(self.db_path)
@@ -57,8 +58,18 @@ class SQLIteTests(unittest.TestCase):
         self.session = Session()
 
     def tearDown(self) -> None:
+        if self.session is not None:
+            try:
+                self.session.close()
+            except Exception:
+                pass  # We are closing session, if close failed - it will be done on process exit
+            self.session = None
+
         if os.path.exists(self.db_path):
-            os.remove(self.db_path)
+            try:
+                os.remove(self.db_path)
+            except PermissionError:
+                pass  # On CI we do not always have permissions to do it.
 
     def test_create(self) -> None:
         """Check column type"""
