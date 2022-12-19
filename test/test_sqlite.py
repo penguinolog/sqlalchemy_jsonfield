@@ -4,7 +4,9 @@ from __future__ import annotations
 
 # Standard Library
 import os.path
+import random
 import sqlite3
+import string
 import sys
 import tempfile
 import unittest
@@ -43,7 +45,9 @@ class SQLIteTests(unittest.TestCase):
         sys_info = (
             f"{sys.implementation.name}_{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
         )
-        self.db_path = os.path.join(tempfile.gettempdir(), f"test.sqlite3_{sys_info}")
+        suffix_source = string.ascii_letters = string.digits
+        suffix = "".join(random.choice(suffix_source) for _ in range(3))
+        self.db_path = os.path.join(tempfile.gettempdir(), f"test.sqlite3_{suffix}_{sys_info}")
         self.session = None
 
         if os.path.exists(self.db_path):
