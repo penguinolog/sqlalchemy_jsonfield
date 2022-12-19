@@ -1,12 +1,8 @@
 SQLAlchemy-JSONField
 ====================
 
-.. image:: https://travis-ci.com/penguinolog/sqlalchemy_jsonfield.svg?branch=master
-    :target: https://travis-ci.com/penguinolog/sqlalchemy_jsonfield
-.. image:: https://coveralls.io/repos/github/penguinolog/sqlalchemy_jsonfield/badge.svg?branch=master
-    :target: https://coveralls.io/github/penguinolog/sqlalchemy_jsonfield?branch=master
-.. image:: https://img.shields.io/circleci/project/github/penguinolog/sqlalchemy_jsonfield.svg
-    :target: https://circleci.com/gh/penguinolog/sqlalchemy_jsonfield
+.. image:: https://github.com/penguinolog/sqlalchemy_jsonfield/workflows/Python%20package/badge.svg
+    :target: https://github.com/penguinolog/sqlalchemy_jsonfield/actions
 .. image:: https://img.shields.io/pypi/v/sqlalchemy_jsonfield.svg
     :target: https://pypi.python.org/pypi/sqlalchemy_jsonfield
 .. image:: https://img.shields.io/pypi/pyversions/sqlalchemy_jsonfield.svg
@@ -47,17 +43,7 @@ Pros:
 * Open Source: https://github.com/penguinolog/sqlalchemy_jsonfield
 * Self-documented code: docstrings with types in comments
 * Uses native JSON by default, but allows to specify different library.
-* Support multiple Python versions:
-
-::
-
-    Python 3.5
-    Python 3.6
-    Python 3.7
-    Python 3.8
-    Python 3.9
-    PyPy
-    PyPy3
+* Support multiple Python versions
 
 Usage
 =====
@@ -113,29 +99,10 @@ and use native JSON fields.
 Testing
 =======
 The main test mechanism for the package `sqlalchemy_jsonfield` is using `tox`.
-Test environments available:
-
-::
-
-    pep8
-    py35
-    py36
-    py37
-    py38
-    pypy3
-    pylint
-    docs
+Available environments can be collected via `tox -l`
 
 CI systems
 ==========
 For code checking several CI systems is used in parallel:
 
-1. `Travis CI: <https://travis-ci.com/penguinolog/sqlalchemy_jsonfield>`_ is used for checking: PEP8, pylint, bandit, installation possibility and unit tests. Also it's publishes coverage on coveralls.
-
-2. `coveralls: <https://coveralls.io/github/penguinolog/sqlalchemy_jsonfield>`_ is used for coverage display.
-
-3. `Circle CI: <https://circleci.com/gh/penguinolog/sqlalchemy_jsonfield>`_ is used for functional tests at separate docker infrastructure. This CI used for **HUGE** tests.
-
-CD system
-=========
-`Travis CI: <https://travis-ci.com/penguinolog/sqlalchemy_jsonfield>`_ is used for package delivery on PyPI.
+1. `GitHub actions: <https://github.com/penguinolog/sqlalchemy_jsonfield/actions>`_ is used for checking: PEP8, pylint, bandit, installation possibility and unit tests.

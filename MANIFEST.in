@@ -1,5 +1,8 @@
-include *.rst LICENSE
+include *.rst LICENSE requirements.txt classifiers.txt
 exclude .travis.yml circle.yml appveyor.yml
 exclude tox.ini pytest.ini .coveragerc
+exclude .gitignore .dockerignore
 prune test
+prune .github
+prune .tox
 exclude CODE_OF_CONDUCT.md

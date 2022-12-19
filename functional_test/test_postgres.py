@@ -1,13 +1,17 @@
-# coding=utf-8
 # pylint: disable=missing-docstring, unused-argument
 
+from __future__ import annotations
+
+# Standard Library
 import unittest
 
-import sqlalchemy.ext.declarative
-import sqlalchemy.engine.url
-import sqlalchemy.orm
+# External Dependencies
 import psycopg2
+import sqlalchemy.engine.url
+import sqlalchemy.ext.declarative
+import sqlalchemy.orm
 
+# Package Implementation
 import sqlalchemy_jsonfield
 
 # Host
@@ -81,16 +85,16 @@ class PostgreSQLTests(unittest.TestCase):
         self.assertEqual(
             dict_record.json_record,
             test_dict,
-            "Dict was changed: {!r} -> {!r}".format(test_dict, dict_record.json_record),
+            f"Dict was changed: {test_dict!r} -> {dict_record.json_record!r}",
         )
 
         self.assertEqual(
-            list_record.json_record, test_list, "List changed {!r} -> {!r}".format(test_list, list_record.json_record)
+            list_record.json_record, test_list, f"List changed {test_list!r} -> {list_record.json_record!r}"
         )
 
         with psycopg2.connect(user=user, dbname=schema_name, host=host_name) as conn:
             with conn.cursor() as cursor:
-                sql = "SELECT row_name, json_record FROM {tbl}".format(tbl=table_name)
+                sql = f"SELECT row_name, json_record FROM {table_name}"
                 cursor.execute(sql)
                 result = dict(cursor.fetchall())
 

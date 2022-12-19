@@ -7,11 +7,11 @@ extension-pkg-whitelist=lxml.etree
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS,.git
+ignore=CVS,.git,_version.py
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
-ignore-patterns=_version.py
+ignore-patterns=
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
@@ -28,12 +28,17 @@ limit-inference-results=100
 
 # List of plugins (as comma separated values of python modules names) to load,
 # usually to register additional checkers.
-load-plugins=pylint.extensions.docparams,
-             pylint.extensions.docstyle,
+load-plugins=pylint.extensions.docstyle,
+             pylint.extensions.docparams,
              pylint.extensions.overlapping_exceptions,
              pylint.extensions.emptystring,
              pylint.extensions.comparetozero,
-             pylint.extensions.check_elif
+             pylint.extensions.check_elif,
+             pylint.extensions.for_any_all,
+             pylint.extensions.code_style,
+             pylint.extensions.redefined_variable_type,
+             pylint.extensions.typing,
+             pylint.extensions.empty_comment
 
 # Pickle collected data for later comparisons.
 persistent=yes
@@ -67,9 +72,7 @@ confidence=
 # --disable=W".
 enable=all
 
-disable=non-ascii-bytes-literal,
-        raw-checker-failed,
-        locally-disabled,
+disable=locally-disabled,
         file-ignored,
         suppressed-message,
         similarities,
@@ -83,8 +86,6 @@ disable=non-ascii-bytes-literal,
         too-many-statements,
         too-many-instance-attributes,
         too-many-lines,
-        misplaced-comparison-constant,
-        bad-continuation,
         broad-except,
         logging-fstring-interpolation,
         logging-format-interpolation
@@ -297,13 +298,6 @@ max-line-length=120
 
 # Maximum number of lines in a module.
 max-module-lines=1000
-
-# List of optional constructs for which whitespace checking is disabled. `dict-
-# separator` is used to allow tabulation in dicts, etc.: {1  : 1,\n222: 2}.
-# `trailing-comma` allows a space between comma and closing bracket: (a, ).
-# `empty-line` allows space-only lines.
-no-space-check=trailing-comma,
-               dict-separator
 
 # Allow the body of a class to be on the same line as the declaration if body
 # contains single statement.

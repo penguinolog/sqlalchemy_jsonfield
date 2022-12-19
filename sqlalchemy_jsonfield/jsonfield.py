@@ -1,11 +1,11 @@
-#    Copyright 2017 Alexey Stepanov aka penguinolog
+#    Copyright 2017-2022 Alexey Stepanov aka penguinolog
 
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
-#
+
 #         http://www.apache.org/licenses/LICENSE-2.0
-#
+
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -13,6 +13,8 @@
 #    under the License.
 
 """JSONField implementation for SQLAlchemy."""
+
+from __future__ import annotations
 
 # Standard Library
 import json
@@ -32,7 +34,7 @@ __all__ = ("JSONField", "mutable_json_field")
 
 
 # noinspection PyAbstractClass
-class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-method
+class JSONField(sqlalchemy.types.TypeDecorator):  # type: ignore[misc]  # pylint: disable=abstract-method
     """Represent an immutable structure as a json-encoded string or json.
 
     Usage::
@@ -41,7 +43,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
 
     """
 
-    def process_literal_param(self, value: typing.Any, dialect: "DefaultDialect") -> typing.Any:
+    def process_literal_param(self, value: typing.Any, dialect: DefaultDialect) -> typing.Any:
         """Re-use of process_bind_param.
 
         :return: encoded value if required
@@ -55,10 +57,10 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
         self,
         enforce_string: bool = False,
         enforce_unicode: bool = False,
-        json: typing.Union[types.ModuleType, typing.Any] = json,  # pylint: disable=redefined-outer-name
-        json_type: "TypeEngine" = sqlalchemy.JSON,
+        json: types.ModuleType | typing.Any = json,  # pylint: disable=redefined-outer-name
+        json_type: TypeEngine = sqlalchemy.JSON,
         *args: typing.Any,
-        **kwargs: typing.Any
+        **kwargs: typing.Any,
     ) -> None:
         """JSONField.
 
@@ -80,7 +82,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
         self.__json_type = json_type
         super().__init__(*args, **kwargs)
 
-    def __use_json(self, dialect: "DefaultDialect") -> bool:
+    def __use_json(self, dialect: DefaultDialect) -> bool:
         """Helper to determine, which encoder to use.
 
         :return: use engine-based json encoder
@@ -88,17 +90,17 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
         """
         return hasattr(dialect, "_json_serializer") and not self.__enforce_string
 
-    def load_dialect_impl(self, dialect: "DefaultDialect") -> "TypeEngine":
+    def load_dialect_impl(self, dialect: DefaultDialect) -> TypeEngine:
         """Select impl by dialect.
 
-        :return: dialect implementation depends of decoding method
+        :return: dialect implementation depends on decoding method
         :rtype: TypeEngine
         """
         if self.__use_json(dialect):
             return dialect.type_descriptor(self.__json_type)
         return dialect.type_descriptor(sqlalchemy.UnicodeText)
 
-    def process_bind_param(self, value: typing.Any, dialect: "DefaultDialect") -> typing.Union[str, typing.Any]:
+    def process_bind_param(self, value: typing.Any, dialect: DefaultDialect) -> str | typing.Any:
         """Encode data, if required.
 
         :return: encoded value if required
@@ -109,7 +111,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
 
         return self.__json_codec.dumps(value, ensure_ascii=not self.__enforce_unicode)
 
-    def process_result_value(self, value: typing.Union[str, typing.Any], dialect: "DefaultDialect") -> typing.Any:
+    def process_result_value(self, value: str | typing.Any, dialect: DefaultDialect) -> typing.Any:
         """Decode data, if required.
 
         :return: decoded result value if required
@@ -124,9 +126,9 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # pylint: disable=abstract-met
 def mutable_json_field(  # pylint: disable=keyword-arg-before-vararg, redefined-outer-name
     enforce_string: bool = False,
     enforce_unicode: bool = False,
-    json: typing.Union[types.ModuleType, typing.Any] = json,
+    json: types.ModuleType | typing.Any = json,
     *args: typing.Any,
-    **kwargs: typing.Any
+    **kwargs: typing.Any,
 ) -> JSONField:
     """Mutable JSONField creator.
 
@@ -143,6 +145,12 @@ def mutable_json_field(  # pylint: disable=keyword-arg-before-vararg, redefined-
     :return: Mutable JSONField via MutableDict.as_mutable
     :rtype: JSONField
     """
-    return sqlalchemy.ext.mutable.MutableDict.as_mutable(
-        JSONField(enforce_string=enforce_string, enforce_unicode=enforce_unicode, json=json, *args, **kwargs)
+    return sqlalchemy.ext.mutable.MutableDict.as_mutable(  # type: ignore[no-any-return]
+        JSONField(  # type: ignore[misc]
+            enforce_string=enforce_string,
+            enforce_unicode=enforce_unicode,
+            json=json,
+            *args,  # noqa: B026
+            **kwargs,
+        )
     )

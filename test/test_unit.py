@@ -1,22 +1,24 @@
-# coding=utf-8
 # pylint: disable=missing-docstring, unused-argument
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
 
+from __future__ import annotations
+
+# Standard Library
+import json
 import unittest
 
-import json
-
+# External Dependencies
 import sqlalchemy.types
-from sqlalchemy.dialects import mysql, sqlite
+from sqlalchemy.dialects import mysql
+from sqlalchemy.dialects import sqlite
 
+# Package Implementation
 import sqlalchemy_jsonfield
 
 
 # noinspection PyStatementEffect
 class BaseFunctionality(unittest.TestCase):
-    def test_impl(self):  # type: () -> None
+    def test_impl(self) -> None:
         # impl placeholder
         self.assertIsInstance(sqlalchemy_jsonfield.JSONField().impl, sqlalchemy.types.TypeEngine)
 

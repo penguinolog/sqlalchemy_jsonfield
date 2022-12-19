@@ -1,0 +1,129 @@
+name: Python package
+
+on: [push]
+
+jobs:
+  PEP8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.2.0
+      - name: Set up Python
+        uses: actions/setup-python@v4.3.1
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade -r flake8_requirements.txt
+      - name: Lint with flake8
+        run: |
+          flake8 sqlalchemy_jsonfield
+
+  PyLint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.2.0
+      - name: Set up Python
+        uses: actions/setup-python@v4.3.1
+        with:
+          python-version: '3.7'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade -r CI_REQUIREMENTS.txt
+          pip install --upgrade "pylint >= 2.6.0"
+      - name: Generate version file
+        run: |
+          python setup.py --version clean
+      - name: Lint with PyLint
+        run: |
+          pylint sqlalchemy_jsonfield
+
+  MyPy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.2.0
+      - name: Set up Python
+        uses: actions/setup-python@v4.3.1
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade -r CI_REQUIREMENTS.txt
+          pip install --upgrade -r mypy_requirements.txt
+      - name: Generate version file
+        run: |
+          python setup.py --version clean
+      - name: Lint with MyPy
+        run: |
+          mypy --strict --install-types --non-interactive sqlalchemy_jsonfield
+
+  Black:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.2.0
+      - name: Set up Python
+        uses: actions/setup-python@v4.3.1
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade black regex
+      - name: Check code style with black
+        run: |
+          black --check sqlalchemy_jsonfield
+
+  Test:
+    needs: [PEP8, PyLint, MyPy, Black]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 6
+      matrix:
+        os: ["ubuntu-latest", "windows-latest"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v3.2.0
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4.3.1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install --upgrade -r CI_REQUIREMENTS.txt
+          pip install --upgrade -r pytest_requirements.txt
+      - name: Build package and install develop
+        run: |
+          pip install -e .
+      - name: Test with pytest
+        run: |
+          py.test --cov-report= --cov=sqlalchemy_jsonfield test
+          coverage report -m
+#          coverage report -m --fail-under 85
+
+  Deploy:
+    needs: [Test]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.2.0
+      - name: Set up Python
+        uses: actions/setup-python@v4.3.1
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade twine build
+      - name: Build package
+        run: |
+          python -m build
+      - name: Deploy
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          twine upload --skip-existing dist/*

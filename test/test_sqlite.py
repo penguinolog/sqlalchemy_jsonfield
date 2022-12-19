@@ -1,22 +1,25 @@
-# coding=utf-8
 # pylint: disable=missing-docstring, unused-argument
 
+from __future__ import annotations
+
+# Standard Library
 import os.path
 import sqlite3
 import tempfile
 import unittest
 
+# External Dependencies
 import sqlalchemy.ext.declarative
 import sqlalchemy.orm
 
 try:
-    # noinspection PyPackageRequirements
+    # External Dependencies
     import ujson as json
 except ImportError:
     import json
 
+# Package Implementation
 import sqlalchemy_jsonfield
-
 
 # Path to test database
 db_path = os.path.join(tempfile.gettempdir(), "test.sqlite3")
@@ -37,11 +40,11 @@ class ExampleTable(Base):
 
 
 class SQLIteTests(unittest.TestCase):
-    def setUp(self):  # type: () -> None
+    def setUp(self) -> None:
         if os.path.exists(db_path):
             os.remove(db_path)
 
-        engine = sqlalchemy.create_engine("sqlite:///{}".format(db_path), echo=False)
+        engine = sqlalchemy.create_engine(f"sqlite:///{db_path}", echo=False)
 
         Base.metadata.create_all(engine)
 
@@ -49,13 +52,13 @@ class SQLIteTests(unittest.TestCase):
         Session = sqlalchemy.orm.sessionmaker(engine)
         self.session = Session()
 
-    def test_create(self):  # type: () -> None
+    def test_create(self) -> None:
         """Check column type"""
         # noinspection PyArgumentList
-        with sqlite3.connect(database="file:{}?mode=ro".format(db_path), uri=True) as conn:
+        with sqlite3.connect(database=f"file:{db_path}?mode=ro", uri=True) as conn:
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
-            c.execute("PRAGMA TABLE_INFO({})".format(table_name))
+            c.execute(f"PRAGMA TABLE_INFO({table_name})")
             collected = c.fetchall()
             result = [dict(col) for col in collected]
 
@@ -69,7 +72,7 @@ class SQLIteTests(unittest.TestCase):
             "Unexpected column type: received: {!s}, expected: TEXT|JSON".format(json_record["type"]),
         )
 
-    def test_operate(self):  # type: () -> None
+    def test_operate(self) -> None:
         """Check column data operation"""
         test_dict = {"key": "value"}
         test_list = ["item0", "item1"]
@@ -93,19 +96,21 @@ class SQLIteTests(unittest.TestCase):
         self.assertEqual(
             dict_record.json_record,
             test_dict,
-            "Dict was changed: {!r} -> {!r}".format(test_dict, dict_record.json_record),
+            f"Dict was changed: {test_dict!r} -> {dict_record.json_record!r}",
         )
 
         self.assertEqual(
-            list_record.json_record, test_list, "List changed {!r} -> {!r}".format(test_list, list_record.json_record)
+            list_record.json_record,
+            test_list,
+            f"List changed {test_list!r} -> {list_record.json_record!r}",
         )
 
         # Low level
 
         # noinspection PyArgumentList
-        with sqlite3.connect(database="file:{}?mode=ro".format(db_path), uri=True) as conn:
+        with sqlite3.connect(database=f"file:{db_path}?mode=ro", uri=True) as conn:
             c = conn.cursor()
-            c.execute("SELECT row_name, json_record FROM {tbl}".format(tbl=table_name))
+            c.execute(f"SELECT row_name, json_record FROM {table_name}")
 
             result = dict(c.fetchall())
 

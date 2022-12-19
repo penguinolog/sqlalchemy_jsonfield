@@ -1,21 +1,23 @@
-# coding=utf-8
 # pylint: disable=missing-docstring, unused-argument
 
+from __future__ import annotations
+
+# Standard Library
 import unittest
 
-import sqlalchemy.ext.declarative
+# External Dependencies
+import pymysql.cursors
 import sqlalchemy.engine.url
+import sqlalchemy.ext.declarative
 import sqlalchemy.orm
 
-# noinspection PyPackageRequirements
-import pymysql.cursors
-
 try:
-    # noinspection PyPackageRequirements
+    # External Dependencies
     import ujson as json
 except ImportError:
     import json
 
+# Package Implementation
 import sqlalchemy_jsonfield
 
 # Host
@@ -59,7 +61,7 @@ class MySQLTests(unittest.TestCase):
     def tearDownClass(cls):
         with pymysql.connect(host=host_name, user=user, password=password, charset="utf8") as cursor:
             # Read a single record
-            sql = "DROP SCHEMA IF EXISTS {sch};".format(sch=schema_name)
+            sql = f"DROP SCHEMA IF EXISTS {schema_name};"
             cursor.execute(sql)
 
     def setUp(self):
@@ -103,16 +105,16 @@ class MySQLTests(unittest.TestCase):
         self.assertEqual(
             dict_record.json_record,
             test_dict,
-            "Dict was changed: {!r} -> {!r}".format(test_dict, dict_record.json_record),
+            f"Dict was changed: {test_dict!r} -> {dict_record.json_record!r}",
         )
 
         self.assertEqual(
-            list_record.json_record, test_list, "List changed {!r} -> {!r}".format(test_list, list_record.json_record)
+            list_record.json_record, test_list, f"List changed {test_list!r} -> {list_record.json_record!r}"
         )
 
         with pymysql.connect(host=host_name, user=user, password=password, db=schema_name, charset="utf8") as cursor:
             # Read a single record
-            sql = "SELECT row_name, json_record FROM {tbl}".format(tbl=table_name)
+            sql = f"SELECT row_name, json_record FROM {table_name}"
             cursor.execute(sql)
             result = dict(cursor.fetchall())
 
