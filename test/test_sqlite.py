@@ -40,7 +40,8 @@ class ExampleTable(Base):
 class SQLIteTests(unittest.TestCase):
     def setUp(self) -> None:
         # Path to test database
-        self.db_path = os.path.join(tempfile.gettempdir(), f"test.sqlite3_{datetime.datetime.utcnow()}")
+        time_component = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
+        self.db_path = os.path.join(tempfile.gettempdir(), f"test.sqlite3_{time_component}")
 
         if os.path.exists(self.db_path):
             os.remove(self.db_path)
