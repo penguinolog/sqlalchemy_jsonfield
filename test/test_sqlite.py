@@ -12,8 +12,12 @@ import tempfile
 import unittest
 
 # External Dependencies
-import sqlalchemy.ext.declarative
 import sqlalchemy.orm
+
+try:
+    from sqlalchemy.orm import declarative_base  # sqlalchemy 2
+except ImportError:
+    from sqlalchemy.ext.declarative import declarative_base
 
 try:
     # External Dependencies
@@ -28,14 +32,14 @@ import sqlalchemy_jsonfield
 table_name = "create_test"
 
 # DB Base class
-Base = sqlalchemy.ext.declarative.declarative_base()
+Base = declarative_base()
 
 
 # Model
 class ExampleTable(Base):
     __tablename__ = table_name
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    row_name = sqlalchemy.Column(sqlalchemy.Unicode(64), unique=True)
+    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    row_name: str = sqlalchemy.Column(sqlalchemy.Unicode(64), unique=True)
     json_record = sqlalchemy.Column(sqlalchemy_jsonfield.JSONField(), nullable=False)
 
 
@@ -58,8 +62,7 @@ class SQLIteTests(unittest.TestCase):
         Base.metadata.create_all(engine)
 
         # noinspection PyPep8Naming
-        Session = sqlalchemy.orm.sessionmaker(engine)
-        self.session = Session()
+        self.session = sqlalchemy.orm.Session(engine, future=True)
 
     def tearDown(self) -> None:
         if self.session is not None:
@@ -102,13 +105,14 @@ class SQLIteTests(unittest.TestCase):
 
         # fill table
 
-        with self.session.transaction:
+        with self.session:
             self.session.add_all(
                 [
                     ExampleTable(row_name="dict_record", json_record=test_dict),
                     ExampleTable(row_name="list_record", json_record=test_list),
                 ]
             )
+            self.session.commit()
 
         # Validate backward check
 
