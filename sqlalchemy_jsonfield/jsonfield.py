@@ -27,14 +27,14 @@ import sqlalchemy.types
 
 if typing.TYPE_CHECKING:
     # External Dependencies
-    from sqlalchemy.engine.default import DefaultDialect  # noqa: F401
+    from sqlalchemy.engine import Dialect  # noqa: F401
     from sqlalchemy.sql.type_api import TypeEngine  # noqa: F401
 
 __all__ = ("JSONField", "mutable_json_field")
 
 
 # noinspection PyAbstractClass
-class JSONField(sqlalchemy.types.TypeDecorator):  # type: ignore[misc]  # pylint: disable=abstract-method
+class JSONField(sqlalchemy.types.TypeDecorator):  # type: ignore[type-arg]  # pylint: disable=abstract-method
     """Represent an immutable structure as a json-encoded string or json.
 
     Usage::
@@ -43,7 +43,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # type: ignore[misc]  # pylint
 
     """
 
-    def process_literal_param(self, value: typing.Any, dialect: DefaultDialect) -> typing.Any:
+    def process_literal_param(self, value: typing.Any, dialect: Dialect) -> typing.Any:
         """Re-use of process_bind_param.
 
         :return: encoded value if required
@@ -58,7 +58,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # type: ignore[misc]  # pylint
         enforce_string: bool = False,
         enforce_unicode: bool = False,
         json: types.ModuleType | typing.Any = json,  # pylint: disable=redefined-outer-name
-        json_type: TypeEngine = sqlalchemy.JSON,
+        json_type: TypeEngine[typing.Any] | type[TypeEngine[typing.Any]] = sqlalchemy.JSON,
         *args: typing.Any,
         **kwargs: typing.Any,
     ) -> None:
@@ -82,7 +82,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # type: ignore[misc]  # pylint
         self.__json_type = json_type
         super().__init__(*args, **kwargs)
 
-    def __use_json(self, dialect: DefaultDialect) -> bool:
+    def __use_json(self, dialect: Dialect) -> bool:
         """Helper to determine, which encoder to use.
 
         :return: use engine-based json encoder
@@ -90,17 +90,18 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # type: ignore[misc]  # pylint
         """
         return hasattr(dialect, "_json_serializer") and not self.__enforce_string
 
-    def load_dialect_impl(self, dialect: DefaultDialect) -> TypeEngine:
+    def load_dialect_impl(self, dialect: Dialect) -> TypeEngine[typing.Any]:
         """Select impl by dialect.
 
         :return: dialect implementation depends on decoding method
         :rtype: TypeEngine
         """
+        # types are handled by DefaultDialect, Dialect class is abstract
         if self.__use_json(dialect):
-            return dialect.type_descriptor(self.__json_type)
-        return dialect.type_descriptor(sqlalchemy.UnicodeText)
+            return dialect.type_descriptor(self.__json_type)  # type: ignore[arg-type]
+        return dialect.type_descriptor(sqlalchemy.UnicodeText)  # type: ignore[arg-type]
 
-    def process_bind_param(self, value: typing.Any, dialect: DefaultDialect) -> str | typing.Any:
+    def process_bind_param(self, value: typing.Any, dialect: Dialect) -> str | typing.Any:
         """Encode data, if required.
 
         :return: encoded value if required
@@ -111,7 +112,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # type: ignore[misc]  # pylint
 
         return self.__json_codec.dumps(value, ensure_ascii=not self.__enforce_unicode)
 
-    def process_result_value(self, value: str | typing.Any, dialect: DefaultDialect) -> typing.Any:
+    def process_result_value(self, value: str | typing.Any, dialect: Dialect) -> typing.Any:
         """Decode data, if required.
 
         :return: decoded result value if required
@@ -145,7 +146,7 @@ def mutable_json_field(  # pylint: disable=keyword-arg-before-vararg, redefined-
     :return: Mutable JSONField via MutableDict.as_mutable
     :rtype: JSONField
     """
-    return sqlalchemy.ext.mutable.MutableDict.as_mutable(  # type: ignore[no-any-return]
+    return sqlalchemy.ext.mutable.MutableDict.as_mutable(  # type: ignore[return-value]
         JSONField(  # type: ignore[misc]
             enforce_string=enforce_string,
             enforce_unicode=enforce_unicode,
