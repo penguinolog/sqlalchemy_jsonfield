@@ -16,19 +16,17 @@
 
 from __future__ import annotations
 
-# Standard Library
 import json
-import types
 import typing
 
-# External Dependencies
 import sqlalchemy.ext.mutable
 import sqlalchemy.types
 
 if typing.TYPE_CHECKING:
-    # External Dependencies
-    from sqlalchemy.engine import Dialect  # noqa: F401
-    from sqlalchemy.sql.type_api import TypeEngine  # noqa: F401
+    import types
+
+    from sqlalchemy.engine import Dialect
+    from sqlalchemy.sql.type_api import TypeEngine
 
 __all__ = ("JSONField", "mutable_json_field")
 
@@ -52,6 +50,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # type: ignore[type-arg]  # py
         return self.process_bind_param(value, dialect)
 
     impl = sqlalchemy.types.TypeEngine  # Special placeholder
+    cache_ok = False  # Cache complexity due to requerement of value re-serialization and mutability
 
     def __init__(  # pylint: disable=keyword-arg-before-vararg
         self,

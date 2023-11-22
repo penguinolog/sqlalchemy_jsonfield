@@ -19,14 +19,14 @@ from __future__ import annotations
 from .jsonfield import JSONField
 from .jsonfield import mutable_json_field
 
-try:
+try:  # noqa: SIM105,FURB107,RUF100
     # Local Implementation
     from ._version import version as __version__
 except ImportError:
     pass
 
 
-__all__ = ("JSONField", "mutable_json_field")
+__all__ = ("JSONField", "mutable_json_field", "__version__")
 
 __author__ = "Alexey Stepanov <penguinolog@gmail.com>"
 __author_email__ = "penguinolog@gmail.com"

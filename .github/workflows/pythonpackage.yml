@@ -1,45 +1,49 @@
 name: Python package
 
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+    tags-ignore:
+      - '*.[0-9][ab][0-9]'
+  pull_request: {}
 
 jobs:
   PEP8:
+    name: Check with Ruff
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4.7.1
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
           cache: 'pip'
-          cache-dependency-path: |
-            requirements.txt
-            flake8_requirements.txt
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install --upgrade -r flake8_requirements.txt
-      - name: Lint with flake8
+          pip install --upgrade ruff
+      - name: Lint with ruff
         run: |
-          flake8 sqlalchemy_jsonfield
+          ruff sqlalchemy_jsonfield --output-format github
 
   PyLint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4.7.1
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.7'
+          python-version: '3.11'
           cache: 'pip'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install --upgrade -r CI_REQUIREMENTS.txt
-          pip install --upgrade "pylint >= 2.6.0"
-      - name: Generate version file
+          pip install --upgrade "pylint >= 3.0.0"
+      - name: Install develop
         run: |
-          python setup.py --version clean
+          pip install -e .
       - name: Lint with PyLint
         run: |
           pylint sqlalchemy_jsonfield
@@ -47,9 +51,9 @@ jobs:
   MyPy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4.7.1
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
           cache: 'pip'
@@ -61,9 +65,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade -r CI_REQUIREMENTS.txt
           pip install --upgrade -r mypy_requirements.txt
-      - name: Generate version file
+      - name: Install develop
         run: |
-          python setup.py --version clean
+          pip install -e .
       - name: Lint with MyPy
         run: |
           mypy --strict --install-types --non-interactive sqlalchemy_jsonfield
@@ -71,9 +75,9 @@ jobs:
   Black:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4.7.1
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
           cache: 'pip'
@@ -85,22 +89,39 @@ jobs:
         run: |
           black --check sqlalchemy_jsonfield
 
+  Refurb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade refurb
+      - name: Lint with refurb
+        run: |
+          refurb sqlalchemy_jsonfield
+
   Test:
-    needs: [PEP8, PyLint, MyPy, Black]
+    needs: [PEP8, PyLint, MyPy, Black, Refurb]  # isort is broken
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 6
       matrix:
-        os: ["ubuntu-latest", "windows-latest"]
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
         include:
           - os: "ubuntu-latest"
             python-version: "pypy3.9"
 
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4.7.1
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
@@ -112,7 +133,7 @@ jobs:
           python -m pip install --upgrade pip wheel
           pip install --upgrade -r CI_REQUIREMENTS.txt
           pip install --upgrade -r pytest_requirements.txt
-      - name: Build package and install develop
+      - name: Install develop
         run: |
           pip install -e .
       - name: Test with pytest
@@ -120,19 +141,37 @@ jobs:
       - name: Report coverage
         run: |
           coverage report -m
+          coverage xml
 #          coverage report -m --fail-under 85
+      - name: Coveralls Parallel
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: run-${{ matrix.python-version }}-${{ matrix.os }}
+          parallel: true
+          file: coverage.xml
 
-  Deploy:
-    needs: [Test]
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+  UploadCoverage:
+    name: Upload coverage to Coveralls
+    needs: [ Test ]
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
+
+  Build:
+    needs: [ Test ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # need for setuptools_scm
       - name: Set up Python
-        uses: actions/setup-python@v4.7.1
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-          cache: 'pip'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -140,9 +179,51 @@ jobs:
       - name: Build package
         run: |
           python -m build
-      - name: Deploy
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      - uses: actions/upload-artifact@v3
+        with:
+          path: dist/*
+          name: wheels
+
+  Metadata:
+    name: Validate metadata
+    runs-on: ubuntu-latest
+    needs: [ Build ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          cache: 'pip'
+      - name: Install dependencies
         run: |
-          twine upload --skip-existing dist/*
+          python -m pip install --upgrade pip
+          pip install --upgrade twine
+      - uses: actions/download-artifact@v3
+        with:
+          # unpacks default artifact into dist/
+          # if `name: wheels` is omitted, the action will create extra parent dir
+          name: wheels
+          path: dist
+      - name: Validate metadata
+        run: |
+          twine check dist/*
+
+  Deploy:
+      needs: [Build, Metadata]
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+      runs-on: ubuntu-latest
+      environment:
+        name: pypi
+        url: https://pypi.org/p/SQLAlchemy-JSONField
+      permissions:
+        id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+      steps:
+        - uses: actions/download-artifact@v3
+          with:
+            # unpacks default artifact into dist/
+            # if `name: artifact` is omitted, the action will create extra parent dir
+            name: wheels
+            path: dist
+        - name: Publish package distributions to PyPI
+          uses: pypa/gh-action-pypi-publish@release/v1

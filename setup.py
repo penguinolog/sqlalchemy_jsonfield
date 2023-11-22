@@ -18,4 +18,15 @@ from __future__ import annotations
 # External Dependencies
 import setuptools
 
-setuptools.setup()
+setuptools.setup(
+    python_requires=">=3.8.0",
+    # While setuptools cannot deal with pre-installed incompatible versions,
+    # setting a lower bound is not harmful - it makes error messages cleaner. DO
+    # NOT set an upper bound on setuptools, as that will lead to uninstallable
+    # situations as progressive releases of projects are done.
+    setup_requires=[
+        "setuptools >= 61.0.0",
+        "setuptools_scm[toml]>=6.2",
+        "wheel",
+    ],
+)

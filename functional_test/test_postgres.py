@@ -2,16 +2,13 @@
 
 from __future__ import annotations
 
-# Standard Library
 import unittest
 
-# External Dependencies
 import psycopg2
 import sqlalchemy.engine.url
 import sqlalchemy.ext.declarative
 import sqlalchemy.orm
 
-# Package Implementation
 import sqlalchemy_jsonfield
 
 # Host
@@ -35,7 +32,7 @@ Base = sqlalchemy.ext.declarative.declarative_base()
 # Model
 class ExampleTable(Base):
     __tablename__ = table_name
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)  # noqa: A003
     row_name = sqlalchemy.Column(sqlalchemy.Unicode(64), unique=True)
     json_record = sqlalchemy.Column(sqlalchemy_jsonfield.JSONField(enforce_string=False), nullable=False)
 
@@ -64,7 +61,7 @@ class PostgreSQLTests(unittest.TestCase):
     def test_operate(self):
         """Check column data operation with unicode specific."""
         test_dict = {"key": "значение"}
-        test_list = ["item0", "элемент1"]
+        test_list = ["item0", "элемент1"]  # noqa: RUF001
 
         # fill table
 
@@ -94,7 +91,7 @@ class PostgreSQLTests(unittest.TestCase):
 
         with psycopg2.connect(user=user, dbname=schema_name, host=host_name) as conn:
             with conn.cursor() as cursor:
-                sql = f"SELECT row_name, json_record FROM {table_name}"
+                sql = f"SELECT row_name, json_record FROM {table_name}"  # noqa: S608  # test
                 cursor.execute(sql)
                 result = dict(cursor.fetchall())
 

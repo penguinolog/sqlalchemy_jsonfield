@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-# Standard Library
+import contextlib
 import os.path
 import random
 import sqlite3
@@ -11,7 +11,6 @@ import sys
 import tempfile
 import unittest
 
-# External Dependencies
 import sqlalchemy.orm
 
 try:
@@ -20,12 +19,10 @@ except ImportError:
     from sqlalchemy.ext.declarative import declarative_base
 
 try:
-    # External Dependencies
     import ujson as json
 except ImportError:
     import json
 
-# Package Implementation
 import sqlalchemy_jsonfield
 
 # Table name
@@ -38,7 +35,7 @@ Base = declarative_base()
 # Model
 class ExampleTable(Base):
     __tablename__ = table_name
-    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)  # noqa: A003
     row_name: str = sqlalchemy.Column(sqlalchemy.Unicode(64), unique=True)
     json_record = sqlalchemy.Column(sqlalchemy_jsonfield.JSONField(), nullable=False)
 
@@ -50,7 +47,7 @@ class SQLIteTests(unittest.TestCase):
             f"{sys.implementation.name}_{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
         )
         suffix_source = string.ascii_letters = string.digits
-        suffix = "".join(random.choice(suffix_source) for _ in range(3))
+        suffix = "".join(random.choice(suffix_source) for _ in range(3))    # noqa: S311
         self.db_path = os.path.join(tempfile.gettempdir(), f"test.sqlite3_{suffix}_{sys_info}")
         self.session = None
 
@@ -66,17 +63,15 @@ class SQLIteTests(unittest.TestCase):
 
     def tearDown(self) -> None:
         if self.session is not None:
-            try:
-                self.session.close()
-            except Exception:
+            with contextlib.suppress(Exception):
                 pass  # We are closing session, if close failed - it will be done on process exit
+                self.session.close()
+
             self.session = None
 
         if os.path.exists(self.db_path):
-            try:
+            with contextlib.suppress(PermissionError):  # On CI we do not always have permissions to do it.
                 os.remove(self.db_path)
-            except PermissionError:
-                pass  # On CI we do not always have permissions to do it.
 
     def test_create(self) -> None:
         """Check column type"""
@@ -137,7 +132,7 @@ class SQLIteTests(unittest.TestCase):
         # noinspection PyArgumentList
         with sqlite3.connect(database=f"file:{self.db_path}?mode=ro", uri=True) as conn:
             c = conn.cursor()
-            c.execute(f"SELECT row_name, json_record FROM {table_name}")
+            c.execute(f"SELECT row_name, json_record FROM {table_name}")  # noqa: S608
 
             result = dict(c.fetchall())
 

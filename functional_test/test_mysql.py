@@ -2,22 +2,18 @@
 
 from __future__ import annotations
 
-# Standard Library
 import unittest
 
-# External Dependencies
 import pymysql.cursors
 import sqlalchemy.engine.url
 import sqlalchemy.ext.declarative
 import sqlalchemy.orm
 
 try:
-    # External Dependencies
     import ujson as json
 except ImportError:
     import json
 
-# Package Implementation
 import sqlalchemy_jsonfield
 
 # Host
@@ -41,7 +37,7 @@ Base = sqlalchemy.ext.declarative.declarative_base()
 # Model
 class ExampleTable(Base):
     __tablename__ = table_name
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)  # noqa: A003
     row_name = sqlalchemy.Column(sqlalchemy.Unicode(64), unique=True)
     json_record = sqlalchemy.Column(
         sqlalchemy_jsonfield.JSONField(enforce_string=True), nullable=False  # MariaDB does not support JSON for now
@@ -54,7 +50,7 @@ class MySQLTests(unittest.TestCase):
     def setUpClass(cls):
         with pymysql.connect(host=host_name, user=user, password=password, charset="utf8") as cursor:
             # Read a single record
-            sql = "DROP SCHEMA IF EXISTS {sch};" "CREATE SCHEMA {sch};".format(sch=schema_name)
+            sql = f"DROP SCHEMA IF EXISTS {schema_name};CREATE SCHEMA {schema_name};"
             cursor.execute(sql)
 
     @classmethod
@@ -84,7 +80,7 @@ class MySQLTests(unittest.TestCase):
     def test_operate(self):
         """Check column data operation with unicode specific."""
         test_dict = {"key": "значение"}
-        test_list = ["item0", "элемент1"]
+        test_list = ["item0", "элемент1"]  # noqa: RUF001
 
         # fill table
 
@@ -114,7 +110,7 @@ class MySQLTests(unittest.TestCase):
 
         with pymysql.connect(host=host_name, user=user, password=password, db=schema_name, charset="utf8") as cursor:
             # Read a single record
-            sql = f"SELECT row_name, json_record FROM {table_name}"
+            sql = f"SELECT row_name, json_record FROM {table_name}"  # noqa: S608
             cursor.execute(sql)
             result = dict(cursor.fetchall())
 
