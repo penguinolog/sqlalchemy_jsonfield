@@ -104,7 +104,7 @@ jobs:
           pip install --upgrade refurb
       - name: Lint with refurb
         run: |
-          refurb sqlalchemy_jsonfield
+          refurb --format github sqlalchemy_jsonfield
 
   Test:
     needs: [PEP8, PyLint, MyPy, Black, Refurb]  # isort is broken
