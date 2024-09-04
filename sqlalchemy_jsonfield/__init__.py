@@ -26,7 +26,7 @@ except ImportError:
     pass
 
 
-__all__ = ("JSONField", "mutable_json_field", "__version__")
+__all__ = ("JSONField", "__version__", "mutable_json_field")
 
 __author__ = "Alexey Stepanov <penguinolog@gmail.com>"
 __author_email__ = "penguinolog@gmail.com"

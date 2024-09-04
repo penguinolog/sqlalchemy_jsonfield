@@ -25,7 +25,7 @@ jobs:
           pip install --upgrade ruff
       - name: Lint with ruff
         run: |
-          ruff sqlalchemy_jsonfield --output-format github
+          ruff check . --output-format github
 
   PyLint:
     runs-on: ubuntu-latest
@@ -118,6 +118,7 @@ jobs:
           - os: "ubuntu-latest"
             python-version: "pypy3.9"
 
+    name: "Script based python ${{ matrix.python-version }} on ${{ matrix.os }}"
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -179,10 +180,10 @@ jobs:
       - name: Build package
         run: |
           python -m build
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: dist/*
-          name: wheels
+          name: built-sdist
 
   Metadata:
     name: Validate metadata
@@ -199,11 +200,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install --upgrade twine
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.8
         with:
-          # unpacks default artifact into dist/
-          # if `name: wheels` is omitted, the action will create extra parent dir
-          name: wheels
+          pattern: built-*
+          merge-multiple: true
           path: dist
       - name: Validate metadata
         run: |
@@ -219,11 +219,10 @@ jobs:
       permissions:
         id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
       steps:
-        - uses: actions/download-artifact@v3
+        - uses: actions/download-artifact@v4.1.8
           with:
-            # unpacks default artifact into dist/
-            # if `name: artifact` is omitted, the action will create extra parent dir
-            name: wheels
+            pattern: built-*
+            merge-multiple: true
             path: dist
         - name: Publish package distributions to PyPI
           uses: pypa/gh-action-pypi-publish@release/v1

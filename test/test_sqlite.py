@@ -35,7 +35,7 @@ Base = declarative_base()
 # Model
 class ExampleTable(Base):
     __tablename__ = table_name
-    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)  # noqa: A003
+    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     row_name: str = sqlalchemy.Column(sqlalchemy.Unicode(64), unique=True)
     json_record = sqlalchemy.Column(sqlalchemy_jsonfield.JSONField(), nullable=False)
 
