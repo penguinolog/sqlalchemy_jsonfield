@@ -11,7 +11,7 @@ build-backend="setuptools.build_meta"
 [project]
 name = "SQLAlchemy-JSONField"
 description = "SQLALchemy JSONField implementation for storing dicts at SQL"
-requires-python = ">=3.7.0"
+requires-python = ">=3.9.0"
 keywords = ["sql", "sqlalchemy", "json", "jsonfield", "development"]
 license={text="Apache-2.0"}  # Use SPDX classifier
 readme = {file = "README.rst", content-type = "text/x-rst"}
@@ -51,7 +51,7 @@ write_to = "sqlalchemy_jsonfield/_version.py"
 
 [tool.black]
 line-length = 120
-target-version = ["py37", "py38"]
+target-version = ["py39"]
 
 [tool.isort]
 line_length = 120
@@ -140,7 +140,7 @@ pretty_print = true
 [tool.ruff]
 line-length = 120
 output-format = "full"
-target-version = "py38"
+target-version = "py39"
 
 [tool.ruff.lint]
 extend-select = [
@@ -187,7 +187,7 @@ allow-dunder-method-names = ["__pretty_repr__", "__pretty_str__", "__rich_repr__
 convention = "pep257"
 
 [tool.refurb]
-python_version = "3.8"
+python_version = "3.9"
 enable_all = true
 ignore = ["FURB120"]
 
@@ -195,7 +195,7 @@ ignore = ["FURB120"]
 extension-pkg-whitelist = ["lxml.etree"]
 ignore = ["CVS", "_version.py"]
 jobs = 0
-py-version = "3.8"
+py-version = "3.9"
 
 load-plugins = [
   "pylint.extensions.docparams",
