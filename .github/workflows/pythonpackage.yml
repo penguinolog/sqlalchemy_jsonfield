@@ -225,6 +225,7 @@ jobs:
       url: https://pypi.org/p/SQLAlchemy-JSONField
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+      contents: read
     steps:
       - uses: actions/download-artifact@v8.0.1
         with:
