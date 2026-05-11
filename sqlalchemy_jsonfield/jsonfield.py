@@ -37,7 +37,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # type: ignore[type-arg]  # py
 
     Usage::
 
-        JSONField(enforce_string=True|False, enforce_unicode=True|False)
+        JSONField(enforce_string=True | False, enforce_unicode=True | False)
 
     """
 

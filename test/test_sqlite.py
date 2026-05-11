@@ -47,7 +47,7 @@ class SQLIteTests(unittest.TestCase):
             f"{sys.implementation.name}_{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
         )
         suffix_source = string.ascii_letters = string.digits
-        suffix = "".join(random.choice(suffix_source) for _ in range(3))    # noqa: S311
+        suffix = "".join(random.choice(suffix_source) for _ in range(3))  # noqa: S311
         self.db_path = os.path.join(tempfile.gettempdir(), f"test.sqlite3_{suffix}_{sys_info}")
         self.session = None
 

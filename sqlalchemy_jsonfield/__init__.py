@@ -20,7 +20,7 @@ from ._version import __version_tuple__
 from .jsonfield import JSONField
 from .jsonfield import mutable_json_field
 
-__all__ = ("JSONField", "__version__", "__version_tuple__","mutable_json_field")
+__all__ = ("JSONField", "__version__", "__version_tuple__", "mutable_json_field")
 
 __author__ = "Aleksei Stepanov <penguinolog@gmail.com>"
 __author_email__ = "penguinolog@gmail.com"

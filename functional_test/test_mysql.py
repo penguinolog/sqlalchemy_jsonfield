@@ -40,7 +40,8 @@ class ExampleTable(Base):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     row_name = sqlalchemy.Column(sqlalchemy.Unicode(64), unique=True)
     json_record = sqlalchemy.Column(
-        sqlalchemy_jsonfield.JSONField(enforce_string=True), nullable=False  # MariaDB does not support JSON for now
+        sqlalchemy_jsonfield.JSONField(enforce_string=True),
+        nullable=False,  # MariaDB does not support JSON for now
     )
 
 
