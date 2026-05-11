@@ -1,4 +1,4 @@
-#    Copyright 2016-2022 Alexey Stepanov aka penguinolog
+#    Copyright 2016-2026 Aleksei Stepanov aka penguinolog
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
@@ -15,20 +15,14 @@
 
 from __future__ import annotations
 
-# Local Implementation
+from ._version import __version__
+from ._version import __version_tuple__
 from .jsonfield import JSONField
 from .jsonfield import mutable_json_field
 
-try:  # noqa: SIM105,FURB107,RUF100
-    # Local Implementation
-    from ._version import version as __version__
-except ImportError:
-    pass
+__all__ = ("JSONField", "__version__", "__version_tuple__","mutable_json_field")
 
-
-__all__ = ("JSONField", "__version__", "mutable_json_field")
-
-__author__ = "Alexey Stepanov <penguinolog@gmail.com>"
+__author__ = "Aleksei Stepanov <penguinolog@gmail.com>"
 __author_email__ = "penguinolog@gmail.com"
 __url__ = "https://github.com/penguinolog/sqlalchemy_jsonfield"
 __description__ = "SQLALchemy JSONField implementation for storing dicts at SQL"

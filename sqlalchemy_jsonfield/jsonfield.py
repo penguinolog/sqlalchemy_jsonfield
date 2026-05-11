@@ -1,4 +1,4 @@
-#    Copyright 2017-2022 Alexey Stepanov aka penguinolog
+#    Copyright 2017-2026 Alexey Stepanov aka penguinolog
 
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -50,7 +50,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # type: ignore[type-arg]  # py
         return self.process_bind_param(value, dialect)
 
     impl = sqlalchemy.types.TypeEngine  # Special placeholder
-    cache_ok = False  # Cache complexity due to requerement of value re-serialization and mutability
+    cache_ok = False  # Cache complexity due to requirement of value re-serialization and mutability
 
     def __init__(  # pylint: disable=keyword-arg-before-vararg
         self,
@@ -82,7 +82,7 @@ class JSONField(sqlalchemy.types.TypeDecorator):  # type: ignore[type-arg]  # py
         super().__init__(*args, **kwargs)
 
     def __use_json(self, dialect: Dialect) -> bool:
-        """Helper to determine, which encoder to use.
+        """Helper to determine which encoder to use.
 
         :return: use engine-based json encoder
         :rtype: bool

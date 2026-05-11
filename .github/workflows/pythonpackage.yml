@@ -27,6 +27,23 @@ jobs:
         run: |
           ruff check . --output-format github
 
+  Formatting:
+    name: Check formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+         python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade ruff
+      - name: Check formatting
+        run: |
+          ruff format --check .
+
   PyLint:
     runs-on: ubuntu-latest
     steps:
@@ -72,23 +89,6 @@ jobs:
         run: |
           mypy --strict --install-types --non-interactive sqlalchemy_jsonfield
 
-  Black:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.x'
-          cache: 'pip'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade black regex
-      - name: Check code style with black
-        run: |
-          black --check sqlalchemy_jsonfield
-
   Refurb:
     runs-on: ubuntu-latest
     steps:
@@ -107,16 +107,16 @@ jobs:
           refurb --format github sqlalchemy_jsonfield
 
   Test:
-    needs: [PEP8, PyLint, MyPy, Black, Refurb]  # isort is broken
+    needs: [PEP8, Formatting, PyLint, MyPy, Refurb]  # isort is broken
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 6
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
         include:
           - os: "ubuntu-latest"
-            python-version: "pypy3.9"
+            python-version: "pypy3.11"
 
     name: "Script based python ${{ matrix.python-version }} on ${{ matrix.os }}"
     steps:
@@ -180,7 +180,7 @@ jobs:
       - name: Build package
         run: |
           python -m build
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           path: dist/*
           name: built-sdist
@@ -200,7 +200,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install --upgrade twine
-      - uses: actions/download-artifact@v6.0.0
+      - uses: actions/download-artifact@v8.0.1
         with:
           pattern: built-*
           merge-multiple: true
@@ -219,7 +219,7 @@ jobs:
       permissions:
         id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
       steps:
-        - uses: actions/download-artifact@v6.0.0
+        - uses: actions/download-artifact@v8.0.1
           with:
             pattern: built-*
             merge-multiple: true

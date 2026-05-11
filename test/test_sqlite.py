@@ -64,7 +64,7 @@ class SQLIteTests(unittest.TestCase):
     def tearDown(self) -> None:
         if self.session is not None:
             with contextlib.suppress(Exception):
-                pass  # We are closing session, if close failed - it will be done on process exit
+                # We are closing session, if close failed - it will be done on process exit
                 self.session.close()
 
             self.session = None

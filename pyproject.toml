@@ -2,7 +2,7 @@
 # Minimum requirements for the build system to execute.
 # PEP 508 specifications for PEP 518.
 requires = [
-    "setuptools >= 61.0.0",
+    "setuptools >= 80.3.0",
     "setuptools_scm[toml]>=6.2",
     "wheel",
 ]
@@ -13,9 +13,10 @@ name = "SQLAlchemy-JSONField"
 description = "SQLALchemy JSONField implementation for storing dicts at SQL"
 requires-python = ">=3.9.0"
 keywords = ["sql", "sqlalchemy", "json", "jsonfield", "development"]
-license={text="Apache-2.0"}  # Use SPDX classifier
+license="Apache-2.0"  # Use SPDX classifier
+license-files=["LICENSE"]
 readme = {file = "README.rst", content-type = "text/x-rst"}
-authors=[{name="Alexey Stepanov", email="penguinolog@gmail.com"}]
+authors=[{name="Aleksei Stepanov", email="penguinolog@gmail.com"}]
 dynamic = ["version", "classifiers", "dependencies"]
 
 [project.urls]
@@ -26,7 +27,6 @@ dynamic = ["version", "classifiers", "dependencies"]
 sqlalchemy_jsonfield=[
   "py.typed",
   "*.pyi",
-  "*/*.pyi"
 ]
 
 [tool.setuptools.packages.find]
@@ -48,10 +48,6 @@ universal = 0
 
 [tool.setuptools_scm]
 write_to = "sqlalchemy_jsonfield/_version.py"
-
-[tool.black]
-line-length = 120
-target-version = ["py39"]
 
 [tool.isort]
 line_length = 120
@@ -151,7 +147,7 @@ extend-select = [
   "FA",  # from __future__ import annotations
   "DTZ",  # flake8-datetimez
   "SLOT",  # flake8-slots
-  "TCH",  # flake8-type-checking
+  "TC",  # flake8-type-checking
   "PTH",  # flake8-use-pathlib
   "S",  # flake8-bandit
   "A",  # flake8-builtins
@@ -159,6 +155,7 @@ extend-select = [
   "ISC",  # flake8-implicit-str-concat
   "RET", "SIM", "C4",  # flake8-return, flake8-simplify, flake8-comprehensions
   "ICN", "PGH",  # flake8-import-conventions, pygrep-hooks
+  "TID",  # flake8-tidy-imports
   "Q",  # quotes
   "FLY",  # Flynt
   "FURB",  # Refurb
@@ -185,6 +182,9 @@ allow-dunder-method-names = ["__pretty_repr__", "__pretty_str__", "__rich_repr__
 
 [tool.ruff.lint.pydocstyle]
 convention = "pep257"
+
+[tool.ruff.format]
+docstring-code-format = true
 
 [tool.refurb]
 python_version = "3.9"
