@@ -207,7 +207,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install --upgrade twine
-      - uses: actions/download-artifact@v8.0.1
+      - uses: actions/download-artifact@v8.0.2
         with:
           pattern: built-*
           merge-multiple: true
@@ -227,7 +227,7 @@ jobs:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
       contents: read
     steps:
-      - uses: actions/download-artifact@v8.0.1
+      - uses: actions/download-artifact@v8.0.2
         with:
           pattern: built-*
           merge-multiple: true
