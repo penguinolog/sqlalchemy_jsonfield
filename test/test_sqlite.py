@@ -126,3 +126,31 @@ class SQLIteTests(unittest.TestCase):
             self.assertEqual(result["dict_record"], json.dumps(test_dict))
 
             self.assertEqual(result["list_record"], json.dumps(test_list))
+
+    def test_literal_render(self) -> None:
+        """Check literal rendered values are stored as data."""
+        test_dict = {"key": "it's (SELECT 1)"}
+        test_str = "(SELECT 'injected')"
+
+        with self.session:
+            for row_name, value in (("dict_literal", test_dict), ("str_literal", test_str)):
+                self.session.execute(
+                    sqlalchemy.insert(ExampleTable).values(
+                        row_name=row_name,
+                        json_record=sqlalchemy.bindparam(
+                            row_name,
+                            value,
+                            type_=ExampleTable.__table__.c.json_record.type,
+                            literal_execute=True,
+                        ),
+                    )
+                )
+            self.session.commit()
+
+        dict_record = self.session.query(ExampleTable).filter(ExampleTable.row_name == "dict_literal").first()
+
+        str_record = self.session.query(ExampleTable).filter(ExampleTable.row_name == "str_literal").first()
+
+        self.assertEqual(dict_record.json_record, test_dict)
+
+        self.assertEqual(str_record.json_record, test_str)
