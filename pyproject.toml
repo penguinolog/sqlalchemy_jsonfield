@@ -1,47 +1,98 @@
 [build-system]
+build-backend = "setuptools.build_meta"
 # Minimum requirements for the build system to execute.
 # PEP 508 specifications for PEP 518.
 requires = [
-    "setuptools >= 80.3.0",
-    "setuptools_scm[toml]>=6.2",
-    "wheel",
+  "setuptools>=80.8.0",
+  "setuptools-scm[toml]>=8.1.0",
 ]
-build-backend="setuptools.build_meta"
 
 [project]
-name = "SQLAlchemy-JSONField"
+name = "sqlalchemy-jsonfield"
 description = "SQLALchemy JSONField implementation for storing dicts at SQL"
-requires-python = ">=3.9.0"
-keywords = ["sql", "sqlalchemy", "json", "jsonfield", "development"]
-license="Apache-2.0"  # Use SPDX classifier
-license-files=["LICENSE"]
-readme = {file = "README.rst", content-type = "text/x-rst"}
-authors=[{name="Aleksei Stepanov", email="penguinolog@gmail.com"}]
-dynamic = ["version", "classifiers", "dependencies"]
-
+readme = { file = "README.rst", content-type = "text/x-rst" }
+keywords = [ "development", "json", "jsonfield", "sql", "sqlalchemy" ]
+license = "Apache-2.0"  # Use SPDX classifier
+license-files = [ "LICENSE" ]
+requires-python = ">=3.11.0"
+dynamic = [ "classifiers", "dependencies", "version" ]
+[[project.authors]]
+name = "Aleksei Stepanov"
+email = "penguinolog@gmail.com"
 [project.urls]
-"Repository" = "https://github.com/penguinolog/sqlalchemy_jsonfield"
+Repository = "https://github.com/penguinolog/sqlalchemy_jsonfield"
 "Bug Tracker" = "https://github.com/penguinolog/sqlalchemy_jsonfield/issues"
 
-[tool.setuptools.package-data]
-sqlalchemy_jsonfield=[
-  "py.typed",
-  "*.pyi",
+[dependency-groups]
+dev = [
+  { include-group = "build" },
+  { include-group = "codecs" },
+  { include-group = "codecs-gil" },
+  { include-group = "lint" },
+  { include-group = "mypy" },
+  { include-group = "pre-commit" },
+  { include-group = "pylint" },
+  { include-group = "pyrefly" },
+  { include-group = "pytest" }
+]
+build = [
+  "build",
+  "twine",
+]
+# Alternative JSON libraries for compatibility tests: wheels for every tested interpreter, free-threading safe.
+codecs = [
+  "simplejson",
+  "ujson",
+  "ujson5",
+]
+# Alternative JSON libraries for compatibility tests: CPython with GIL only
+# (orjson: no PyPy/free-threaded wheels, rapidjson re-enables the GIL).
+codecs-gil = [
+  "orjson; platform_python_implementation == 'CPython'",
+  "python-rapidjson; platform_python_implementation == 'CPython'",
+]
+functional = [
+  "psycopg2",
+  "pymysql",
+  { include-group = "pytest" },
+]
+lint = [
+  "pyproject-fmt",
+  "yamllint",
+  { include-group = "ruff" },
+]
+mypy = [
+  "mypy[faster-cache,reports]",
+]
+pre-commit = [
+  "prek",
+]
+pylint = [
+  "pylint",
+]
+pyrefly = [
+  "pyrefly",
+]
+pytest = [
+  "pytest",
+  "pytest-cov",
+  "pytest-timeout",
+]
+ruff = [
+  "ruff",
 ]
 
 [tool.setuptools.packages.find]
-exclude = [
-  "doc*",
-  "examples",
-  "test*",
-  "bin",
-  ".*"
+include = [
+  "sqlalchemy_jsonfield",
+  "sqlalchemy_jsonfield.*",
 ]
 namespaces = false
-
+[tool.setuptools.package-data]
+sqlalchemy_jsonfield = [ "*.pyi", "py.typed" ]
 [tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
-classifiers = {file = ["classifiers.txt"]}
+classifiers = { file = [ "classifiers.txt" ] }
+dependencies = { file = [ "requirements.txt" ] }
 
 [tool.distutils.bdist_wheel]
 universal = 0
@@ -49,201 +100,183 @@ universal = 0
 [tool.setuptools_scm]
 write_to = "sqlalchemy_jsonfield/_version.py"
 
-[tool.isort]
-line_length = 120
-multi_line_output = 3
-force_single_line = true
-
-[tool.doc8]
-max-line-length = 150
-
-[tool.pydocstyle]
-ignore = [
-  "D401",
-  "D202",
-  "D203",
-  "D213"
-]
-# First line should be in imperative mood; try rephrasing
-# No blank lines allowed after function docstring
-# 1 blank line required before class docstring
-# Multi-line docstring summary should start at the second line
-match = "(?!_version|test_)*.py"
-
-[tool.mypy]
-strict = true
-warn_unused_configs = true
-warn_redundant_casts = true
-show_error_context = true
-show_column_numbers = true
-show_error_codes = true
-pretty = true
-
-[[tool.mypy.overrides]]
-module = [
-  "sqlalchemy.*",
-]
-ignore_missing_imports = true
-
-[tool.pytest.ini_options]
-minversion = "6.0"
-addopts = "-vvv -s -p no:django -p no:ipdb"
-testpaths = ["test"]
-mock_use_standalone_module = false
-junit_family = "xunit2"
-
-[tool.coverage.run]
-omit = ["test/*"]
-branch = true
-
-[tool.coverage.report]
-exclude_lines = [
-  # Have to re-enable the standard pragma
-  "pragma: no cover",
-
-  # Don't complain about missing debug-only code:
-  "def __repr__",
-
-  # Don't complain if tests don't hit defensive assertion code:
-  "raise NotImplementedError",
-
-  # Exclude methods marked as abstract
-  "@abstractmethod",
-
-  # Exclude import statements
-  "^from\b",
-  "^import\b",
-
-  # Exclude variable declarations that are executed when file is loaded
-  "^[a-zA-Z_]+\b\\s=",
-
-  # Code for static analysis is never covered:
-  "if typing.TYPE_CHECKING:",
-
-  # Fallback code with no installed deps is almost impossible to cover properly
-  "except ImportError:",
-
-  # Don't complain if non-runnable code isn't run:
-  "if __name__ == .__main__.:",
-
-  # OS Specific
-  "if platform.system()",
-]
-
-[tool.coverage.json]
-pretty_print = true
-
 [tool.ruff]
+target-version = "py311"
 line-length = 120
 output-format = "full"
-target-version = "py39"
-
+[tool.ruff.format]
+docstring-code-format = true
+[tool.ruff.lint.per-file-ignores]
+"*test/*.py" = [ "D100", "D101", "D102", "D103", "PT009", "PT027", "S101" ]
+[tool.ruff.lint.isort]
+force-single-line = true
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
 [tool.ruff.lint]
 extend-select = [
-  "E",
-  "W",  # also pycodestyle warnings
-  "PYI",  # flake8-pyi
-  "ASYNC",  # flake8-async
-  "FA",  # from __future__ import annotations
-  "DTZ",  # flake8-datetimez
+  "A",     # flake8-builtins
+  "ASYNC", # flake8-async
+  "B",     # flake8-bugbear
+  "BLE",   # flake8-blind-except
+  "C4",    # flake8-comprehensions
+  "D",     # pydocstyle
+  "DTZ",   # flake8-datetimez
+  "E",     # pycodestyle errors
+  "EXE",   # flake8-executable
+  "F",     # pyflakes
+  "FA",    # flake8-future-annotations
+  "FLY",   # flynt
+  "FURB",  # refurb
+  "I",     # isort
+  "ICN",   # flake8-import-conventions
+  "ISC",   # flake8-implicit-str-concat
+  "PERF",  # perflint
+  "PGH",   # pygrep-hooks
+  "PIE",   # flake8-pie
+  "PL",    # pylint
+  "PTH",   # flake8-use-pathlib
+  "PYI",   # flake8-pyi
+  "Q",     # flake8-quotes
+  "RET",   # flake8-return
+  "RSE",   # flake8-raise
+  "RUF",   # Ruff-specific rules
+  "S",     # flake8-bandit
+  "SIM",   # flake8-simplify
   "SLOT",  # flake8-slots
-  "TC",  # flake8-type-checking
-  "PTH",  # flake8-use-pathlib
-  "S",  # flake8-bandit
-  "A",  # flake8-builtins
-  "B", "T10", "EXE",  # flake8-bugbear, flake8-debugger, flake8-executable
-  "ISC",  # flake8-implicit-str-concat
-  "RET", "SIM", "C4",  # flake8-return, flake8-simplify, flake8-comprehensions
-  "ICN", "PGH",  # flake8-import-conventions, pygrep-hooks
-  "TID",  # flake8-tidy-imports
-  "Q",  # quotes
-  "FLY",  # Flynt
-  "FURB",  # Refurb
-  "TRY", "UP", "I", "PL", "PERF", "RUF",  # tryceratops, pyupgrade, isort, pylint + perflint, Ruff-specific
+  "T10",   # flake8-debugger
+  "TC",    # flake8-type-checking
+  "TID",   # flake8-tidy-imports
+  "TRY",   # tryceratops
+  "UP",    # pyupgrade
+  "W",     # pycodestyle warnings
 ]
 extend-ignore = [
-  # refactor rules (too many statements/arguments/branches)
-  "PLR0904", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLR0917", "PLR2004",
-  "PLR6301",  # "maybe staticmethod"
-  "RET504",  # Unnecessary variable assignment before return statement
+  "E203",    # handled by formatter
+  "E221",    # handled by formatter
+  "E222",    # handled by formatter
+  "ISC001",  # conflicts with the formatter, which can produce single-line implicit concatenation
+  "PLR0904", # refactor rule: too many public methods
+  "PLR0911", # refactor rule: too many return statements
+  "PLR0912", # refactor rule: too many branches
+  "PLR0913", # refactor rule: too many arguments
+  "PLR0914", # refactor rule: too many locals
+  "PLR0915", # refactor rule: too many statements
+  "PLR0917", # refactor rule: too many positional arguments
+  "PLR2004", # magic value comparison
+  "PLR6301", # no-self-use
+  "RET504",  # Unnecessary variable assignment before a return statement
   "SIM108",  # Use ternary operator,
   "TRY003",  # long messages prepare outside, ...
 ]
 
-[tool.ruff.lint.per-file-ignores]
-"test_*.py" = ["SIM117", "PTH107", "PTH110", "PTH118"]
-
-[tool.ruff.lint.isort]
-force-single-line = true
-known-third-party = ["logwrap", "paramiko", "tenacity", "pyyaml", "ruamel.yaml", "psutil"]
-
-[tool.ruff.lint.pylint]
-allow-dunder-method-names = ["__pretty_repr__", "__pretty_str__", "__rich_repr__"]
-
-[tool.ruff.lint.pydocstyle]
-convention = "pep257"
-
-[tool.ruff.format]
-docstring-code-format = true
-
-[tool.refurb]
-python_version = "3.9"
-enable_all = true
-ignore = ["FURB120"]
-
 [tool.pylint]
-extension-pkg-whitelist = ["lxml.etree"]
-ignore = ["CVS", "_version.py"]
+disable = [
+  "file-ignored",
+  "invalid-name",
+  "locally-disabled",
+  "similarities",
+  "suppressed-message",
+  "too-few-public-methods",
+  "too-many-ancestors",
+  "too-many-arguments",
+  "too-many-positional-arguments",
+]
+enable = "all"
+ignore = [ "_version.py", "CVS" ]
 jobs = 0
-py-version = "3.9"
-
 load-plugins = [
+  "pylint.extensions.check_elif",
+  "pylint.extensions.code_style",
+  "pylint.extensions.dict_init_mutate",
   "pylint.extensions.docparams",
   "pylint.extensions.docstyle",
-  "pylint.extensions.overlapping_exceptions",
-  "pylint.extensions.check_elif",
+  "pylint.extensions.dunder",
+  "pylint.extensions.empty_comment",
   "pylint.extensions.for_any_all",
-  "pylint.extensions.code_style",
+  "pylint.extensions.overlapping_exceptions",
   "pylint.extensions.redefined_variable_type",
   "pylint.extensions.typing",
-  "pylint.extensions.empty_comment",
-  "pylint.extensions.dunder",
-]
-
-enable = "all"
-disable = [
-  "locally-disabled",
-  "file-ignored",
-  "suppressed-message",
-  "similarities",
-  "too-many-ancestors",
-  "too-few-public-methods",
-  "too-many-public-methods",
-  "too-many-return-statements",
-  "too-many-branches",
-  "too-many-arguments",
-  "too-many-locals",
-  "too-many-statements",
-  "too-many-instance-attributes",
-  "too-many-lines",
-  "broad-except",
-  "logging-fstring-interpolation",
-  "logging-format-interpolation",
-  "consider-alternative-union-syntax",
-  "deprecated-typing-alias",
-  "invalid-name"
 ]
 max-line-length = 120
-reports = false
-
-[tool.pylint.dunder]
-good-dunder-names = ["__pretty_repr__", "__pretty_str__"]
-
+py-version = "3.11"
+[tool.pylint.format]
+ignore-long-lines = "^(\\s*(# )?<?https?://\\S+>?)|(.+# type: ignore\\[[\\w\\-\\,]+\\])$"
 [tool.pylint.parameter_documentation]
 accept-no-param-doc = true
 accept-no-raise-doc = false
 accept-no-return-doc = false
 accept-no-yields-doc = false
-
 # Possible choices: ['sphinx', 'epytext', 'google', 'numpy', 'default']
 default-docstring-type = "default"
+
+[tool.pyproject-fmt]
+# After how many columns split arrays/dicts into multiple lines and wrap long strings;
+# use a trailing comma in arrays to force multiline format instead of lowering this value
+column_width = 120
+# Keep full version numbers (e.g., 1.0.0 instead of 1.0) in dependency specifiers
+keep_full_version = true
+generate_python_version_classifiers = false
+# Table format: "short" collapses sub-tables to dotted keys, "long" expands to [table.subtable] headers
+table_format = "long"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+show_error_context = true
+show_column_numbers = true
+pretty = true
+
+[tool.pyrefly]
+python-version = "3.11.0"
+project-includes = [ "sqlalchemy_jsonfield", "test" ]
+# pytest puts the test directory to sys.path (rootdir conftest): resolve "from conftest import ..." the same way.
+search-path = [ ".", "test" ]
+check-unannotated-defs = true
+infer-return-types = "never"
+preset = "legacy"
+[tool.pyrefly.errors]
+# mypy needs these casts, and its strict mode reports any that become redundant.
+redundant-cast = "ignore"
+no-any-return = "error"
+implicit-any-parameter = "error"
+unannotated-return = "error"
+implicit-any = "error"
+# Stale "# pyrefly: ignore" comments fail the check. Unused "# type: ignore" comments stay unreported here:
+# they belong to mypy, and its strict mode reports them.
+unused-ignore = "error"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [ "test" ]
+addopts = "-vvv -s -p no:django -p no:ipdb --cov --cov-report=term"
+junit_family = "xunit2"
+# The timeout is in seconds per test, so a hang fails that one test instead of the whole CI job.
+timeout = 300
+
+[tool.coverage.run]
+source_pkgs = [ "sqlalchemy_jsonfield" ]
+omit = [ ".tox/*", "functional_test/*", "sqlalchemy_jsonfield/_version.py", "test/*" ]
+branch = true
+[tool.coverage.report]
+exclude_lines = [
+  "@abstractmethod",            # abstract
+  "@typing\\.overload",         # overload stub
+  "^[a-zA-Z_]+\\b\\s=",         # module-level assignment, run on import
+  "^from\\b",                   # import, run on import
+  "^import\\b",                 # import, run on import
+  "def __repr__",               # debug-only repr
+  "except ImportError:",        # fallback without optional dependencies
+  "if __name__ == .__main__.:", # script entry point
+  "if TYPE_CHECKING:",          # static analysis only
+  "if typing\\.TYPE_CHECKING:", # static analysis only
+  "pragma: no cover",           # standard pragma, re-enabled because this list replaces the default
+  "raise NotImplementedError",  # defensive code tests do not reach
+]
+[tool.coverage.json]
+pretty_print = true
+
+[tool.refurb]
+python_version = "3.11"
+enable_all = true
+# FURB120 asks to drop arguments equal to the default, which hides the explicit API mapping in mutable_json_field.
+ignore = [ "FURB120" ]

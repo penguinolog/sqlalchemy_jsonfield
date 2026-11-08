@@ -1,0 +1,36 @@
+name: Lint YAML
+
+on:
+  pull_request:
+    paths:
+      - "**.yml"
+      - "**.yaml"
+      - "yamllint-requirements.txt"
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.3.3
+      - name: Lint YAML files
+        run: uv run --no-project --with-requirements yamllint-requirements.txt yamllint . -f github
+
+  actionlint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check workflow files
+        uses: reviewdog/action-actionlint@v1

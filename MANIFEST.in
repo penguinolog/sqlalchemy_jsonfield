@@ -1,8 +1,8 @@
 include *.rst LICENSE requirements.txt classifiers.txt
-exclude .travis.yml circle.yml appveyor.yml
-exclude tox.ini pytest.ini .coveragerc
-exclude .gitignore .dockerignore
+exclude tox.ini *-requirements.txt pytest_requirements.txt .pre-commit-config.yaml .yamllint.yml .readthedocs.yaml
+exclude .gitignore .dockerignore .editorconfig Dockerfile docker-compose.yml
 prune test
+prune functional_test
 prune .github
 prune .tox
-exclude CODE_OF_CONDUCT.md
+exclude CODE_OF_CONDUCT.md TODO.md

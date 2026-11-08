@@ -1,0 +1,4 @@
+# Alternative JSON libraries for compatibility tests: CPython with GIL only.
+# orjson: no PyPy/free-threaded wheels, rapidjson re-enables the GIL on free-threaded builds.
+orjson==3.13.0; platform_python_implementation == "CPython"
+python-rapidjson==1.26; platform_python_implementation == "CPython"

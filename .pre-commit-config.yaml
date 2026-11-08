@@ -2,37 +2,36 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-    - id: check-yaml
-    - id: end-of-file-fixer
-    - id: trailing-whitespace
-    - id: mixed-line-ending
-
-  - repo: https://github.com/pycqa/isort
-    rev: 9.0.0a3
-    hooks:
-    - id: isort
-      name: isort (python)
-    - id: isort
-      name: isort (cython)
-      types: [cython]
-    - id: isort
-      name: isort (pyi)
-      types: [pyi]
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+        args: [ --fix=lf ]
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-merge-conflict
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Ruff version.
-    rev: v0.15.12
+    rev: v0.17.0
     hooks:
-      # Run the linter.
       - id: ruff-check
-        args: [ --fix ]
-      # Run the formatter.
+        args: [ --show-fixes, --fix ]
       - id: ruff-format
+
+  - repo: https://github.com/tox-dev/pyproject-fmt
+    rev: v2.30.3
+    hooks:
+      - id: pyproject-fmt
+
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.38.0
+    hooks:
+      - id: yamllint
 
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0  # Use the ref you want to point at
     hooks:
-    - id: python-check-blanket-noqa
-    - id: python-check-blanket-type-ignore
-    - id: rst-directive-colons
-    - id: rst-inline-touching-normal
+      - id: python-check-blanket-noqa
+      - id: python-check-blanket-type-ignore
+      - id: rst-directive-colons
+      - id: rst-inline-touching-normal

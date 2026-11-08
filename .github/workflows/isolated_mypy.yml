@@ -1,0 +1,31 @@
+name: Isolated Mypy check
+
+on:
+  pull_request:
+    paths:
+      - "mypy-requirements.txt"
+      - ".github/workflows/isolated_mypy.yml"
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  Mypy:
+    name: Check with mypy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.3.3
+      - name: Create virtual environment
+        run: uv venv --python 3.14
+      - name: Install package
+        run: uv pip install -e .
+      - name: Install dependencies
+        run: uv pip install --upgrade -r mypy-requirements.txt
+      - name: Type check with mypy
+        run: uv run --no-project mypy sqlalchemy_jsonfield

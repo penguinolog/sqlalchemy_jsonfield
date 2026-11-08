@@ -2,7 +2,7 @@ FROM python:slim
 # Build tools. Mandatory for the future tests support
 RUN apt-get update && apt-get upgrade -y && apt-get install -y libpq-dev gcc
 # Test runner and actual packaging tools
-RUN pip install -U setuptools tox pip
+RUN pip install -U pip tox tox-uv
 # Copy tests
 ADD . /mnt/test
 WORKDIR /mnt/test

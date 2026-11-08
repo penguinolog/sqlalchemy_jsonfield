@@ -2,17 +2,13 @@
 
 from __future__ import annotations
 
+import json
 import unittest
 
 import pymysql.cursors
 import sqlalchemy.engine.url
 import sqlalchemy.ext.declarative
 import sqlalchemy.orm
-
-try:
-    import ujson as json
-except ImportError:
-    import json
 
 import sqlalchemy_jsonfield
 

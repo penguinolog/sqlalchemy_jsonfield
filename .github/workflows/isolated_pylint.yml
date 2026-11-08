@@ -1,0 +1,31 @@
+name: Isolated PyLint check
+
+on:
+  pull_request:
+    paths:
+      - "pylint-requirements.txt"
+      - ".github/workflows/isolated_pylint.yml"
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  PyLint:
+    name: Check with pylint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.3.3
+      - name: Create virtual environment
+        run: uv venv --python 3.14
+      - name: Install package
+        run: uv pip install -e .
+      - name: Install dependencies
+        run: uv pip install --upgrade -r pylint-requirements.txt
+      - name: Lint with pylint
+        run: uv run --no-project pylint --output-format=github sqlalchemy_jsonfield
