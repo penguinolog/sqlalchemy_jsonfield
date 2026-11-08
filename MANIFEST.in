@@ -1,6 +1,6 @@
 include *.rst LICENSE requirements.txt classifiers.txt
 exclude tox.ini *-requirements.txt pytest_requirements.txt .pre-commit-config.yaml .yamllint.yml .readthedocs.yaml
-exclude .gitignore .dockerignore Dockerfile docker-compose.yml
+exclude .gitignore .dockerignore .editorconfig Dockerfile docker-compose.yml
 prune test
 prune functional_test
 prune .github
