@@ -1,0 +1,4 @@
+# Alternative JSON libraries for compatibility tests: wheels for every tested interpreter, free-threading safe.
+simplejson==4.2.0
+ujson==6.1.0
+ujson5==1.0.1

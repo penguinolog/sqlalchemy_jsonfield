@@ -1,0 +1,32 @@
+name: Isolated Pyrefly check
+
+on:
+  pull_request:
+    paths:
+      - "pyrefly-requirements.txt"
+      - "pytest_requirements.txt"
+      - ".github/workflows/isolated_pyrefly.yml"
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  Pyrefly:
+    name: Check with Pyrefly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.3.3
+      - name: Create virtual environment
+        run: uv venv --python 3.14
+      - name: Install package
+        run: uv pip install -e .
+      - name: Install dependencies
+        run: uv pip install --upgrade -r pyrefly-requirements.txt -r pytest_requirements.txt
+      - name: Type check with Pyrefly
+        run: uv run --no-project pyrefly check --output-format full-text-with-github
