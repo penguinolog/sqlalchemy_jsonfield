@@ -89,12 +89,14 @@ class PostgreSQLTests(unittest.TestCase):
             list_record.json_record, test_list, f"List changed {test_list!r} -> {list_record.json_record!r}"
         )
 
-        with psycopg2.connect(user=user, dbname=schema_name, host=host_name) as conn:
-            with conn.cursor() as cursor:
-                sql = f"SELECT row_name, json_record FROM {table_name}"  # noqa: S608  # test
-                cursor.execute(sql)
-                result = dict(cursor.fetchall())
+        with (
+            psycopg2.connect(user=user, dbname=schema_name, host=host_name) as conn,
+            conn.cursor() as cursor,
+        ):
+            sql = f"SELECT row_name, json_record FROM {table_name}"  # noqa: S608  # test
+            cursor.execute(sql)
+            result = dict(cursor.fetchall())
 
-                self.assertEqual(result["dict_record"], test_dict)
+            self.assertEqual(result["dict_record"], test_dict)
 
-                self.assertEqual(result["list_record"], test_list)
+            self.assertEqual(result["list_record"], test_list)

@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import contextlib
-import os.path
-import random
+import json
+import pathlib
+import shutil
 import sqlite3
-import string
 import sys
 import tempfile
 import unittest
@@ -18,10 +18,6 @@ try:
 except ImportError:
     from sqlalchemy.ext.declarative import declarative_base
 
-try:
-    import ujson as json
-except ImportError:
-    import json
 
 import sqlalchemy_jsonfield
 
@@ -35,48 +31,39 @@ Base = declarative_base()
 # Model
 class ExampleTable(Base):
     __tablename__ = table_name
-    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    row_name: str = sqlalchemy.Column(sqlalchemy.Unicode(64), unique=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    row_name = sqlalchemy.Column(sqlalchemy.Unicode(64), unique=True)
     json_record = sqlalchemy.Column(sqlalchemy_jsonfield.JSONField(), nullable=False)
 
 
 class SQLIteTests(unittest.TestCase):
     def setUp(self) -> None:
-        # Path to test database
-        sys_info = (
-            f"{sys.implementation.name}_{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-        )
-        suffix_source = string.ascii_letters = string.digits
-        suffix = "".join(random.choice(suffix_source) for _ in range(3))  # noqa: S311
-        self.db_path = os.path.join(tempfile.gettempdir(), f"test.sqlite3_{suffix}_{sys_info}")
-        self.session = None
+        # Separate temporary directory per test: parallel runs and leftovers from aborted runs do not collide.
+        self.db_dir = pathlib.Path(tempfile.mkdtemp(prefix=f"sqlalchemy_jsonfield_{sys.implementation.name}_"))
+        self.db_path = self.db_dir / "test.sqlite3"
 
-        if os.path.exists(self.db_path):
-            os.remove(self.db_path)
+        self.engine = sqlalchemy.create_engine(f"sqlite:///{self.db_path}", echo=False)
 
-        engine = sqlalchemy.create_engine(f"sqlite:///{self.db_path}", echo=False)
-
-        Base.metadata.create_all(engine)
+        Base.metadata.create_all(self.engine)
 
         # noinspection PyPep8Naming
-        self.session = sqlalchemy.orm.Session(engine, future=True)
+        self.session: sqlalchemy.orm.Session = sqlalchemy.orm.Session(self.engine, future=True)
 
     def tearDown(self) -> None:
-        if self.session is not None:
-            with contextlib.suppress(Exception):
-                # We are closing session, if close failed - it will be done on process exit
-                self.session.close()
+        with contextlib.suppress(Exception):
+            # We are closing session, if close failed - it will be done on process exit
+            self.session.close()
 
-            self.session = None
+        # Release pooled connections: Windows can not remove a file which is still open.
+        self.engine.dispose()
 
-        if os.path.exists(self.db_path):
-            with contextlib.suppress(PermissionError):  # On CI we do not always have permissions to do it.
-                os.remove(self.db_path)
+        # On CI we do not always have permissions to do it.
+        shutil.rmtree(self.db_dir, ignore_errors=True)
 
     def test_create(self) -> None:
-        """Check column type"""
+        """Check column type."""
         # noinspection PyArgumentList
-        with sqlite3.connect(database=f"file:{self.db_path}?mode=ro", uri=True) as conn:
+        with contextlib.closing(sqlite3.connect(database=f"file:{self.db_path}?mode=ro", uri=True)) as conn:
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
             c.execute(f"PRAGMA TABLE_INFO({table_name})")
@@ -94,7 +81,7 @@ class SQLIteTests(unittest.TestCase):
         )
 
     def test_operate(self) -> None:
-        """Check column data operation"""
+        """Check column data operation."""
         test_dict = {"key": "value"}
         test_list = ["item0", "item1"]
 
@@ -111,9 +98,9 @@ class SQLIteTests(unittest.TestCase):
 
         # Validate backward check
 
-        dict_record = self.session.query(ExampleTable).filter(ExampleTable.row_name == "dict_record").first()
+        dict_record = self.session.query(ExampleTable).filter(ExampleTable.row_name == "dict_record").one()
 
-        list_record = self.session.query(ExampleTable).filter(ExampleTable.row_name == "list_record").first()
+        list_record = self.session.query(ExampleTable).filter(ExampleTable.row_name == "list_record").one()
 
         self.assertEqual(
             dict_record.json_record,
@@ -130,7 +117,7 @@ class SQLIteTests(unittest.TestCase):
         # Low level
 
         # noinspection PyArgumentList
-        with sqlite3.connect(database=f"file:{self.db_path}?mode=ro", uri=True) as conn:
+        with contextlib.closing(sqlite3.connect(database=f"file:{self.db_path}?mode=ro", uri=True)) as conn:
             c = conn.cursor()
             c.execute(f"SELECT row_name, json_record FROM {table_name}")  # noqa: S608
 
