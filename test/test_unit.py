@@ -47,7 +47,13 @@ class BaseFunctionality(unittest.TestCase):
         )
 
         self.assertEqual(
-            sqlalchemy_jsonfield.JSONField().process_literal_param({"key": "val"}, mysql.dialect()), {"key": "val"}
+            sqlalchemy_jsonfield.JSONField().process_literal_param({"key": "val"}, mysql.dialect()),
+            '\'{"key": "val"}\'',
+        )
+
+        self.assertEqual(
+            sqlalchemy_jsonfield.JSONField().process_literal_param("x'); --", sqlite.dialect()),
+            "'\"x''); --\"'",
         )
 
         self.assertEqual(
